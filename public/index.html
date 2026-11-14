@@ -60,7 +60,7 @@ input[type=text]:focus{border-color:var(--acc)}
 .seg a:hover{background:rgba(255,255,255,.1)}
 .info{font-weight:600;color:var(--mut);margin:12px 0 0;text-align:center;min-height:20px}
 .grille{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:980px}
-@media(max-width:780px){.grille{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.grille{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px;text-align:center;position:relative}
 .box.vide{border-style:dashed;color:var(--mut);display:grid;place-items:center;font-weight:700;min-height:150px}
 .box img{width:100%;aspect-ratio:3/2;object-fit:contain;background:linear-gradient(#eaf4ff,#d6e8fb);border-radius:12px;display:block}
@@ -137,6 +137,13 @@ body:not(.tactile) #item{left:auto;right:max(14px,env(safe-area-inset-right));bo
 .niv{margin-top:12px;font-size:13px;font-weight:700;color:var(--mut)} .niv b{color:var(--acc)} .niv .g{height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;margin-top:6px} .niv .g i{display:block;height:100%;background:var(--acc)}
 .ligne .pts{color:var(--acc);font-size:14px;margin-left:10px;white-space:nowrap} .ligne .aw{font-size:10px;font-weight:800;letter-spacing:.05em;background:rgba(255,255,255,.14);border-radius:6px;padding:2px 6px;margin-left:6px;white-space:nowrap}
 #xpl{font-weight:800;color:var(--acc);margin:10px 0 0}
+#menu{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 118px);z-index:5;font-size:16px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--glass);color:#fff;cursor:pointer}
+#pause{position:absolute;inset:0;background:rgba(8,11,22,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:7}
+.trow{display:grid;grid-template-columns:34px minmax(0,1fr) 70px 92px 62px 62px 62px;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);font-weight:700;font-size:14px}
+.trow.h{color:var(--mut);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.trow i{font-style:normal;color:var(--acc);font-weight:800;text-align:center}.trow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}.trow em{font-style:normal;text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}.trow b{text-align:right}
+.trow.moi{background:rgba(255,210,63,.12);border-radius:8px}.trow.moi span{color:var(--acc)}
+@media(max-width:640px){.trow{grid-template-columns:28px minmax(0,1fr) 58px 54px 54px}.trow .x{display:none}}
 #results{position:absolute;inset:0;background:rgba(8,11,22,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;z-index:6;overflow:auto}
 #results h2{font-size:clamp(26px,5vw,40px);margin:0 0 14px;font-weight:800}
 .ligne{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 16px 8px 10px;margin:5px 0;width:100%;max-width:520px;font-weight:800;font-size:18px}
@@ -146,46 +153,114 @@ body:not(.tactile) #item{left:auto;right:max(14px,env(safe-area-inset-right));bo
 .ligne .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ligne .tp{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--mut)}
 #results .cta{max-width:520px}
+
+/* ---------- ergonomie : barres d'action, fenetres, adaptation telephone / ordinateur */
+button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,border-color .15s,filter .15s}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+@media(hover:hover){.btn:hover,.cta.ghost:hover,.adresse:hover{background:rgba(255,255,255,.14)}.cta:not(.ghost):hover{filter:brightness(1.08)}.pastille:hover{transform:scale(1.14)}}
+.screen{padding-bottom:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;max-width:1120px;margin:0 0 14px}
+.topbar .brand{margin:0;justify-content:flex-start;text-align:left;gap:2px 12px;min-width:0}
+.topbar .brand h1{overflow-wrap:anywhere}
+.tools{display:flex;gap:8px;flex-shrink:0}
+.tools .btn{white-space:nowrap;min-height:44px;border-radius:999px;padding:8px 15px;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+.cols,.grille{max-width:1120px}
+.cols{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start;margin-bottom:16px}
+.pvcard{position:sticky;top:12px}
+.acct input[type=text],.acct input[type=password],.acct select{font-size:16px;padding:11px 12px}
+.acct .btn{font-size:15px;padding:10px 14px;flex:1}
+.dock{position:sticky;bottom:0;z-index:4;width:calc(100% + 28px);margin:auto -14px 0;padding:18px 14px max(14px,env(safe-area-inset-bottom));background:linear-gradient(rgba(11,16,32,0),rgba(11,16,32,.97) 16px);display:flex;flex-direction:column;align-items:center}
+.dock .cta{white-space:nowrap}.ract .cta{white-space:nowrap}
+.dock .in{display:flex;gap:8px;width:100%;max-width:820px;align-items:stretch;flex-wrap:wrap}
+.dock input[type=text]{margin:0;flex:1 1 150px;min-width:0;font-size:16px;background:#1a2036}
+.dock .cta{margin:0;flex:2 1 220px;width:auto}
+.dock .cta.ghost{flex:1 1 130px}
+.dock .info{margin:0 0 8px;min-height:0;font-size:13px}.dock .in+.info{margin:8px 0 0}.dock .info:empty{display:none}
+#duo2{color:var(--mut);font-weight:700;font-size:13px;margin-top:10px}
+.modal{position:fixed;inset:0;z-index:20;background:rgba(8,11,22,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;padding:16px;overflow:auto}
+.modal .card{width:100%;max-width:400px;background:#161c33;margin:auto}
+.adresse{font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:10px;max-width:100%;font-size:15px;color:var(--txt);margin:0 0 12px;padding:10px 16px}
+.adresse b{color:var(--acc);white-space:nowrap}.adresse span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mut);font-weight:700}
+.regl{width:100%;max-width:1120px;display:flex;gap:10px 28px;flex-wrap:wrap;justify-content:center;padding:10px 14px;margin-bottom:12px}
+.rl{display:flex;align-items:center;gap:10px;min-width:0}
+.rl em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+#themes,#botsel{margin:0}
+.seg{flex-wrap:wrap;justify-content:center}
+.grille{margin-bottom:16px}
+#top .seg{margin-bottom:8px}
+#results{justify-content:flex-start}#results>*{flex-shrink:0}#results h2{margin-top:auto}#results #rmsg{margin-bottom:auto}
+.ligne .tp{white-space:nowrap}
+.ract{display:flex;gap:10px;width:100%;max-width:520px;flex-wrap:wrap}.ract .cta{flex:1 1 160px}
+.tactile #duo,.tactile #duo2,.tactile .pconly{display:none}
+#menu,#son{width:44px;height:44px}#menu{top:calc(max(10px,env(safe-area-inset-top)) + 122px)}
+@media(max-width:640px){
+  .cols{grid-template-columns:1fr}
+  .topbar .brand p{display:none}.brand h1{font-size:22px}
+  .tools .btn span{display:none}
+  .pvcard{top:0;z-index:3;padding:8px;background:rgba(22,28,51,.96)}.pvcard h2{display:none}
+  #preview{aspect-ratio:auto;height:min(28dvh,220px)}
+  .niv{margin-top:8px;font-size:12px}
+  .opt{grid-template-columns:86px 48px 1fr 48px}.opt .btn{padding:11px 0}
+  .optc .pastille{width:32px;height:32px}.optc .rang{gap:8px}
+  .seg span,.seg a{padding:9px 9px;font-size:13.5px}
+  .dock .cta.ghost{flex:0 1 auto;padding-left:16px;padding-right:16px}.dock .cta{flex:1 1 150px;font-size:17px}.ract .cta{flex:1 1 130px;font-size:16px;padding:14px 10px}
+  .dock #ghint{font-size:12px}
+  .rl{flex-direction:column;gap:6px;width:100%}
+  .box.vide{min-height:104px}.box .nom{font-size:15px}
+  .ligne{font-size:15px;gap:8px;padding:6px 10px 6px 6px}.ligne img{width:58px;height:39px}.ligne .rg{width:26px;font-size:18px}.ligne .nm{flex:1 1 0;min-width:0}.ligne .aw{display:none}.ligne .pts{margin-left:2px;font-size:12px}.ligne .tp{font-size:14px;margin-left:0}
+}
+@media(max-height:520px) and (min-width:641px){
+  .screen{padding-top:max(8px,env(safe-area-inset-top))}
+  .topbar{margin-bottom:8px}.brand h1{font-size:22px}.topbar .brand p{font-size:12px}
+  #duo{display:none}
+  .cols{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);margin-bottom:8px}
+  .pvcard{top:6px}#preview{aspect-ratio:auto;height:max(110px,calc(100dvh - 215px))}
+  .dock{padding-top:12px}.dock .in{flex-wrap:nowrap}.dock #ghint{display:none}
+  .box img{aspect-ratio:2/1}.box.vide{min-height:90px}
+  #results h2{font-size:24px;margin-bottom:8px}.ligne{padding:5px 14px 5px 8px;margin:3px 0}.ligne img{width:60px;height:40px}
+}
 </style>
 </head>
 <body>
 
 <!-- ATELIER -->
 <div id="garage" class="screen">
-  <div class="brand"><h1>La Grande <span>Descente</span></h1><p>Caisses à savon · 4 pilotes</p></div>
+  <header class="topbar"><div class="brand"><h1>La Grande <span>Descente</span></h1><p>Caisses à savon · 4 pilotes</p></div><div class="tools"><button class="btn" id="btop" title="Classement général">🏆<span> Classement</span></button><button class="btn" id="bacct">👤 Compte</button></div></header>
   <div id="duo"><div class="seg"><span class="on">Solo</span><a href="/duo?n=2">2 joueurs</a><a href="/duo?n=3">3 joueurs</a><a href="/duo?n=4">4 joueurs</a></div><p class="cap">À plusieurs : même clavier, écran partagé</p></div>
   <div class="cols">
-    <div class="card">
-      <h2>Ta caisse</h2>
-      <canvas id="preview"></canvas>
-      <div class="niv" id="niv"></div>
+    <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div class="niv" id="niv"></div></div>
+    <div class="card"><h2>Atelier</h2><div id="opts"></div><button class="btn" id="rand" style="margin-top:12px">🎲 Au hasard</button></div>
+  </div>
+  <div class="dock">
+    <p class="info" id="ghint">Tape un nom de salle : elle est créée si elle n'existe pas, sinon tu la rejoins. Vide : salle privée.</p>
+    <div class="in">
+      <input id="nom" type="text" maxlength="14" placeholder="Ton nom de pilote" autocomplete="off" enterkeyhint="go">
+      <input id="room" type="text" maxlength="16" placeholder="Nom de la salle" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="characters" enterkeyhint="go" style="text-transform:uppercase">
+      <button class="cta" id="go">Créer ou rejoindre la salle</button>
     </div>
-    <div class="card">
-      <h2>Atelier</h2>
-      <div class="acct" id="acct"></div>
-      <div id="opts"></div>
-      <button class="btn" id="rand" style="margin-top:12px">Au hasard</button>
-      <input id="nom" type="text" maxlength="14" placeholder="Ton nom de pilote" autocomplete="off">
-      <input id="room" type="text" maxlength="6" placeholder="Code de partie (vide = nouvelle partie)" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase">
-      <button class="cta" id="go">Aller sur la grille</button>
-      <p class="info" id="gmsg"></p>
-    </div>
+    <p class="info" id="gmsg"></p>
   </div>
 </div>
+<div id="acctm" class="modal hidden"><div class="card"><h2>Compte pilote</h2><div class="acct" id="acct"></div><button class="cta ghost" id="acctx">Fermer</button></div></div>
 
 <!-- GRILLE -->
 <div id="lobby" class="screen hidden">
-  <div class="brand"><h1>Grille de <span>départ</span></h1><p id="lsub">Même réseau, même adresse</p></div>
-  <div class="adresse" id="adresse" title="Copier"></div>
-  <div class="seg" id="themes"></div>
-  <div class="seg" id="botsel"></div>
+  <header class="topbar"><div class="brand"><h1 id="ltitle">Grille de <span>départ</span></h1><p id="lsub"></p></div><div class="tools"><button class="btn" id="btop2" title="Classement général">🏆<span> Classement</span></button><button class="btn" id="bleave">Quitter</button></div></header>
+  <button class="adresse" id="adresse" title="Inviter"></button>
+  <div class="card regl"><div class="rl"><em>Circuit</em><div class="seg" id="themes"></div></div><div class="rl"><em>Bots</em><div class="seg" id="botsel"></div></div></div>
   <div class="grille" id="grille"></div>
-  <p class="info" id="lmsg"></p>
-  <div class="actions">
-    <button class="cta" id="start">Lancer la descente</button>
-    <button class="cta ghost" id="edit">Retoucher ma caisse</button>
-    <a class="cta ghost" id="duo2" href="/duo?n=2" style="text-align:center;text-decoration:none;flex:1 1 100%">Jouer à plusieurs sur ce clavier</a>
+  <div class="dock">
+    <p class="info" id="lmsg"></p>
+    <div class="in"><button class="cta ghost" id="edit">Ma caisse</button><button class="cta" id="start">Lancer la descente</button></div>
+    <a id="duo2" href="/duo?n=2">Jouer à plusieurs sur ce clavier</a>
   </div>
+</div>
+
+<!-- CLASSEMENT GENERAL -->
+<div id="top" class="screen hidden">
+  <header class="topbar"><div class="tools"><button class="btn" id="tback">← Retour</button></div><div class="brand" style="justify-content:flex-end;text-align:right"><h1>Classement <span>général</span></h1><p>Les 50 meilleurs pilotes</p></div></header>
+  <div class="seg" id="ttabs"></div>
+  <div class="card" style="width:100%;max-width:820px;margin:6px 0 24px"><div id="tlist"></div><p class="info" id="tme"></p></div>
 </div>
 
 <!-- COURSE -->
@@ -214,11 +289,13 @@ body:not(.tactile) #item{left:auto;right:max(14px,env(safe-area-inset-right));bo
     <div class="pad" id="pr"><svg viewBox="0 0 24 24"><path d="M8.5 4.5 16 12l-7.5 7.5-1.8-1.8 5.7-5.7-5.7-5.7z"/></svg></div>
   </div>
   <button id="son" title="Son">♪</button>
+  <button id="menu" title="Menu">☰</button>
+  <div id="pause" class="hidden"><div class="card" style="width:100%;max-width:360px;text-align:center"><h2>Menu</h2><button class="cta" id="presume">Reprendre la course</button><button class="cta ghost" id="pquit">Abandonner et revenir à la grille</button><button class="cta ghost" id="pleave">Quitter la salle</button><p class="info">La course continue pendant ce temps.<span class="pconly"> Échap pour fermer.</span></p></div></div>
   <div id="results" class="hidden">
     <h2>Classement</h2>
     <div id="rlist" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>
     <p id="xpl"></p>
-    <button class="cta" id="again">Nouvelle manche</button>
+    <div class="ract"><button class="cta" id="again">Nouvelle manche</button><button class="cta ghost" id="rleave">Quitter la salle</button></div>
     <p class="info" id="rmsg"></p>
   </div>
 </div>
@@ -386,32 +463,38 @@ const flagOf=cc=>/^[A-Z]{2}$/.test(cc||'')?String.fromCodePoint(127397+cc.charCo
 const PAYS_CODES='AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ CA CD CF CG CH CI CK CL CM CN CO CR CU CV CW CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IM IN IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MQ MR MS MT MU MV MW MX MY MZ NA NC NE NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TG TH TJ TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
 function paysOptions(sel){ let dn=null; try{dn=new Intl.DisplayNames(['fr'],{type:'region'});}catch(_){} const L=PAYS_CODES.map(c=>[c,dn?dn.of(c):c]).sort((a,b)=>a[1].localeCompare(b[1],'fr')); return '<option value="">Pays (facultatif)</option>'+L.map(q=>'<option value="'+q[0]+'"'+(q[0]===sel?' selected':'')+'>'+flagOf(q[0])+' '+q[1]+'</option>').join(''); }
 let ws=null, myId=null, hostId=null, players=[], phase='lobby', serverAddr='', editing=false, roomCode='', wantConn=false, reconn=0;
-const cleanCode=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+const cleanCode=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[\s_]+/g,'-').replace(/[^A-Z0-9-]/g,'').replace(/-+/g,'-').slice(0,16).replace(/^-|-$/g,'');
 const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ'; let c=''; for(let i=0;i<4;i++)c+=A[rnd0(A.length)]; return c;};
 function send(o){if(ws&&ws.readyState===1)ws.send(JSON.stringify(o));}
-function show(id){['garage','lobby','race'].forEach(s=>$(s).classList.toggle('hidden',s!==id));}
+function show(id){['garage','lobby','race','top'].forEach(s=>$(s).classList.toggle('hidden',s!==id));}
 function profile(){ const p={name:$('nom').value.trim(), cfg:cfg, color:cfg.c}; if(account&&session)p.session=session; return p; }
 // --- comptes pilotes (version en ligne uniquement) : pseudo + code secret
 let account=null, session='', cfgTimer=null; const SKEY='gdsess'+(PN||'');
 try{session=localStorage.getItem(SKEY)||'';}catch(_){}
 async function api(body){ try{ const r=await fetch('/api/account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return await r.json(); }catch(_){ return {ok:false,err:'reseau'}; } }
 const AERR={pseudo:'Pseudo : 3 à 14 lettres ou chiffres.',code:'Code : 4 caractères minimum.',pris:'Ce pseudo est déjà pris.',ident:'Pseudo ou code incorrect.',bloque:'Trop d\'essais, réessaie dans 10 minutes.',reseau:'Serveur injoignable.',serveur:'Erreur du serveur.',session:'Session expirée.'};
-function renderAcct(msg){ const box=$('acct'); if(LAN){box.classList.add('hidden'); return;}
+function syncPlay(){ const inr=!!myId; $('room').classList.toggle('hidden',LAN||EMBED||inr); $('ghint').classList.toggle('hidden',LAN||EMBED||inr); $('nom').classList.toggle('hidden',!!account); $('go').textContent=inr?'Valider et revenir à la grille':(LAN||EMBED?'Aller sur la grille':'Créer ou rejoindre la salle'); }
+function renderAcct(msg){ const box=$('acct'); { const b=$('bacct'); b.classList.toggle('hidden',LAN); b.textContent=account?((flagOf(account.pays)?flagOf(account.pays)+' ':'')+account.pseudo+' · Niv. '+levelOf(account.xp)):'👤 Compte'; } if(LAN){box.classList.add('hidden'); return;}
   if(account){ const a=account, TN={campagne:'Campagne',desert:'Désert',hiver:'Hiver'};
     box.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><b></b> · Niveau '+levelOf(a.xp)+'</span><button class="btn" id="aout">Déconnexion</button></div><select id="apays2" style="margin:8px 0 0">'+paysOptions(a.pays||'')+'</select><div class="st">'+a.races+' course'+(a.races>1?'s':'')+' · '+a.wins+' victoire'+(a.wins>1?'s':'')+' · '+a.podiums+' podium'+(a.podiums>1?'s':'')+(a.hist||[]).slice(0,3).map(h=>'<br>'+(h.r===1?'1er':h.r+'e')+' sur '+h.n+' · '+(TN[h.th]||'')+' · '+fmt(h.t||0)).join('')+'</div>';
     box.querySelector('b').textContent=(flagOf(a.pays)?flagOf(a.pays)+' ':'')+a.pseudo; $('apays2').onchange=async()=>{ const r=await api({action:'pays',session:session,pays:$('apays2').value}); if(r.ok){account=r.account; renderAcct(); if(ws&&myId)send(Object.assign({t:'car'},profile()));} }; $('aout').onclick=async()=>{ const s0=session; setAccount(null,''); api({action:'logout',session:s0}); };
   } else {
     box.innerHTML='<input id="apseudo" type="text" maxlength="14" placeholder="Pseudo" autocomplete="username" autocapitalize="none"><input id="acode" type="password" maxlength="40" placeholder="Code secret" autocomplete="current-password"><select id="apays">'+paysOptions('FR')+'</select><div class="rang"><button class="btn" id="alog">Connexion</button><button class="btn" id="asign">Créer un compte</button></div><p class="astuce" id="amsg"></p>';
     $('amsg').textContent=msg||'Un compte garde ton niveau, tes courses et tes podiums. Facultatif.';
-    const go=async action=>{ $('amsg').textContent='...'; const r=await api({action:action,pseudo:$('apseudo').value,code:$('acode').value,pays:$('apays').value}); if(r.ok){ setAccount(r.account,r.session,action==='signup'); } else $('amsg').textContent=AERR[r.err]||'Erreur.'; };
+    const go=async action=>{ $('amsg').textContent='...'; const r=await api({action:action,pseudo:$('apseudo').value,code:$('acode').value,pays:$('apays').value}); if(r.ok){ setAccount(r.account,r.session,action==='signup'); $('acctm').classList.add('hidden'); } else $('amsg').textContent=AERR[r.err]||'Erreur.'; };
     $('alog').onclick=()=>go('login'); $('asign').onclick=()=>go('signup');
   } }
 function setAccount(a,s,fresh){ account=a; if(s!==undefined){ session=s; try{ if(s)localStorage.setItem(SKEY,s); else localStorage.removeItem(SKEY); }catch(_){} }
   if(a){ $('nom').value=a.pseudo; $('nom').disabled=true; if(a.cfg&&!fresh){cfg=normCfg(a.cfg); buildOpts(); previewDirty=true;} else api({action:'cfg',session:session,cfg:cfg}); } else $('nom').disabled=false;
-  renderAcct(); showLevel(); }
+  renderAcct(); showLevel(); syncPlay(); }
 async function refreshAccount(){ if(!account||!session)return; const r=await api({action:'me',session:session}); if(r.ok){ account=r.account; renderAcct(); showLevel(); } }
 
-function lost(msg){ wantConn=false; myId=null; racing=false; reconn=0; const k=ws; ws=null; if(k){try{k.close();}catch(_){}} show('garage'); $('go').textContent='Aller sur la grille'; $('gmsg').textContent=msg; }
+// --- retours : quitter la partie, abandonner la course
+let quitSeed=0;
+function leaveRoom(){ send({t:'leave'}); wantConn=false; const k=ws; ws=null; setTimeout(()=>{try{if(k)k.close();}catch(_){}} ,200); myId=null; racing=false; players=[]; reconn=0;
+  $('results').classList.add('hidden'); $('pause').classList.add('hidden'); show('garage'); syncPlay(); $('gmsg').textContent=''; previewDirty=true; if(pv)pv.resize=true; roomCode=''; $('room').value=''; }
+function quitRace(){ if(track)quitSeed=track.seed; send({t:'quit'}); racing=false; $('pause').classList.add('hidden'); $('results').classList.add('hidden'); show('lobby'); renderLobby(); }
+function lost(msg){ wantConn=false; myId=null; racing=false; reconn=0; const k=ws; ws=null; if(k){try{k.close();}catch(_){}} show('garage'); syncPlay(); $('gmsg').textContent=msg; }
 // La connexion peut etre coupee par l'hebergeur (duree maximale d'une fonction) : on se
 // reconnecte tout seul avec le meme jeton, le serveur nous rend la meme place.
 function connect(){
@@ -426,25 +509,25 @@ $('go').onclick=()=>{
   audioInit(); editing=false;
   if(ws&&ws.readyState===1&&myId){send(Object.assign({t:'car'},profile())); show('lobby'); return;}
   if(ws)return;
-  roomCode=LAN?'LAN':cleanCode($('room').value); if(roomCode.length<3)roomCode=newCode(); if(!LAN)$('room').value=roomCode;
+  if(LAN)roomCode='LAN'; else { const typed=$('room').value.trim(); roomCode=cleanCode(typed); if(typed&&roomCode.length<2){ $('gmsg').textContent='Nom de salle : 2 à 16 lettres ou chiffres.'; return; } if(!typed)roomCode=newCode(); $('room').value=roomCode; }
   $('gmsg').textContent='Connexion...'; wantConn=true; reconn=0; connect();
 };
 function onMsg(m){
-  if(m.t==='welcome'){ const changed=myId!=null&&m.id!==myId; myId=m.id; reconn=0; $('gmsg').textContent=''; $('go').textContent='Valider ma caisse';
-    if(m.room&&!LAN){roomCode=m.room; if(!EMBED){try{history.replaceState(null,'','?room='+roomCode);}catch(_){}}}
+  if(m.t==='welcome'){ const changed=myId!=null&&m.id!==myId; myId=m.id; reconn=0; $('gmsg').textContent=''; syncPlay();
+    if(m.room&&!LAN)roomCode=m.room;
     if(changed)racing=false; else if(racing&&me&&me.fin!=null&&!me.finAck)send({t:'finish',time:me.fin,score:me.score,hits:me.hits}); }
-  else if(m.t==='full')lost('Grille complète (4 pilotes).');
-  else if(m.t==='badroom')lost('Code de partie invalide.');
+  else if(m.t==='full')lost(LAN?'Grille complète (4 pilotes).':'Salle complète (4 pilotes). Choisis un autre nom.');
+  else if(m.t==='badroom')lost('Nom de salle invalide.');
   else if(m.t==='state'){
     players=m.players; hostId=m.host; phase=m.phase; serverAddr=m.addr||''; lobbyTheme=m.theme||'alea'; lobbyBots=m.bots||0; if(m.raceBots)raceBots=m.raceBots;
     players.forEach(p=>{p.cfg=normCfg(p.cfg);});
     if(phase==='lobby'){racing=false; $('results').classList.add('hidden'); if(!editing)show('lobby');}
     else if(phase==='results'){ if(racing)showResults(m.results); else show('lobby'); }
-    else if(phase==='race'&&m.seed&&(m.racers||[]).includes(myId)&&(!racing||!track||track.seed!==m.seed)) startRace({seed:m.seed,racers:m.racers,theme:m.raceTheme,bots:m.raceBots,countdown:Math.max(0,4000-((m.now||0)-(m.startedAt||0)))});
+    else if(phase==='race'&&m.seed&&m.seed!==quitSeed&&(m.racers||[]).includes(myId)&&(!racing||!track||track.seed!==m.seed)) startRace({seed:m.seed,racers:m.racers,theme:m.raceTheme,bots:m.raceBots,countdown:Math.max(0,4000-((m.now||0)-(m.startedAt||0)))});
     else if(phase==='race'&&!racing&&!(m.racers||[]).includes(myId)) show('lobby');
     renderLobby();
   }
-  else if(m.t==='start'){ if(!(racing&&track&&track.seed===m.seed))startRace(m); }
+  else if(m.t==='start'){ if(!(racing&&track&&track.seed===m.seed)&&(m.racers||[]).includes(myId))startRace(m); }
   else if(m.t==='pos'){const o=others[m.id]; if(o){o.nx=m.x;o.ns=m.z;o.v=m.s;o.na=m.a;o.nd=m.d;o.nst=m.st;o.rep=m.r; if(!o.got){o.got=true;o.x=m.x;o.s=m.z;}}}
   else if(m.t==='hit'){const ob=track&&track.objs[m.i]; if(ob&&!ob.hit&&ob.type!=='bosse'&&ob.type!=='tremplin')explode(ob,10,0);}
   else if(m.t==='wheel'){if(world&&racing)spawnWheel(m.w,m.id,m.z,m.x,m.s,m.i||0);}
@@ -460,18 +543,41 @@ function renderLobby(){
     else{b.className='box'; b.innerHTML='<div class="num" style="background:'+p.color+'">'+(s+1)+'</div><img alt=""><div class="nom"></div>'+(p.id===hostId?'<span class="tag">HÔTE</span>':'')+(p.id===myId?'<span class="tag moi">TOI</span>':'')+(p.acct?'<span class="tag moi">NIV. '+levelOf(p.xp||0)+'</span>':'');
       b.querySelector('img').src=thumbOf(p.cfg); b.querySelector('.nom').textContent=(flagOf(p.pays)?flagOf(p.pays)+' ':'')+p.name;}
     g.appendChild(b);}
-  $('adresse').textContent=LAN?(serverAddr||location.origin):location.host+'/?room='+roomCode; $('lsub').textContent=LAN?'Même réseau, même adresse':'Partage ce lien, ou le code '+roomCode;
+  { const ad=$('adresse'); ad.innerHTML='<b>'+(LAN?'Adresse':'🔗 Inviter')+'</b><span></span>'; ad.querySelector('span').textContent=LAN?(serverAddr||location.origin):location.host+'/?room='+roomCode;
+    if(!LAN){ $('ltitle').innerHTML='Salle <span></span>'; $('ltitle').querySelector('span').textContent=roomCode; }
+    $('lsub').textContent=LAN?'Même réseau, même adresse':'Tes amis tapent ce nom pour te rejoindre'; }
   const host=myId===hostId, busy=phase!=='lobby';
   const tb=$('themes'); tb.innerHTML=''; [['alea','Au hasard'],['campagne','Campagne'],['desert','Désert'],['hiver','Hiver']].forEach(q=>{ const el=document.createElement(host&&!busy?'a':'span'); el.textContent=q[1]; if(q[0]===lobbyTheme)el.className='on'; else if(!host||busy)el.style.opacity=.45; if(host&&!busy){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'theme',v:q[0]});};} tb.appendChild(el); });
-  { const bb=$('botsel'), maxB=Math.max(0,4-players.length); bb.innerHTML='<em>Bots</em>'; for(let k=0;k<=3;k++){ const ok=host&&!busy&&k<=maxB, el=document.createElement(ok?'a':'span'); el.textContent=String(k); if(k===Math.min(lobbyBots,maxB))el.className='on'; else if(!ok)el.style.opacity=.4; if(ok){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'bots',v:k});};} bb.appendChild(el); } }
+  { const bb=$('botsel'), maxB=Math.max(0,4-players.length); bb.innerHTML=''; for(let k=0;k<=3;k++){ const ok=host&&!busy&&k<=maxB, el=document.createElement(ok?'a':'span'); el.textContent=String(k); if(k===Math.min(lobbyBots,maxB))el.className='on'; else if(!ok)el.style.opacity=.4; if(ok){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'bots',v:k});};} bb.appendChild(el); } }
   $('start').classList.toggle('hidden',!host||busy);
   $('lmsg').textContent=busy?'Manche en cours, tu pars à la prochaine.':(host?'Tu es l\'hôte ('+players.length+'/4 pilotes).':'L\'hôte donne le départ...')+(lobbyBots>0?' Avec des bots, la course ne compte pas dans l\'historique.':'');
   $('again').classList.toggle('hidden',!host); $('rmsg').textContent=host?'':'L\'hôte relance la manche...';
 }
 $('start').onclick=()=>{audioInit(); send({t:'start'});};
-$('adresse').onclick=()=>{ const url=LAN?(serverAddr||location.origin):location.origin+'/?room='+roomCode; try{navigator.clipboard.writeText(url).then(()=>{$('lmsg').textContent='Lien copié.';});}catch(_){} };
-{ const qr=cleanCode(QS.get('room')); if(qr)$('room').value=qr; if(LAN||EMBED)$('room').classList.add('hidden');
-  document.querySelectorAll('#duo a, #duo2').forEach(a=>a.addEventListener('click',()=>{ const c=LAN?'':cleanCode(roomCode||$('room').value); if(c.length>=3)a.href=a.getAttribute('href').split('&room=')[0]+'&room='+c; })); }
+$('bleave').onclick=leaveRoom; $('rleave').onclick=leaveRoom; $('pleave').onclick=leaveRoom; $('pquit').onclick=quitRace;
+$('menu').onclick=()=>$('pause').classList.toggle('hidden'); $('presume').onclick=()=>$('pause').classList.add('hidden');
+addEventListener('keydown',e=>{ if(e.key==='Escape'&&racing)$('pause').classList.toggle('hidden'); });
+// --- classement general des comptes
+let topBack='garage', topBy='xp';
+async function loadTop(by){ topBy=by; const T=$('ttabs'); T.innerHTML=''; [['xp','Niveau'],['wins','Victoires'],['podiums','Podiums']].forEach(q=>{ const a=document.createElement('a'); a.href='#'; a.textContent=q[1]; if(q[0]===by)a.className='on'; a.onclick=e=>{e.preventDefault(); loadTop(q[0]);}; T.appendChild(a); });
+  const L=$('tlist'); L.innerHTML='<p class="info">Chargement...</p>'; $('tme').textContent='';
+  const r=await api({action:'top',by:by,session:account?session:''}); if(topBy!==by)return;
+  if(!r.ok){ L.innerHTML='<p class="info">Classement indisponible.</p>'; return; }
+  if(!r.top.length){ L.innerHTML='<p class="info">Aucun pilote classé pour l\'instant. Crée un compte et termine une course.</p>'; return; }
+  L.innerHTML='<div class="trow h"><i>#</i><span>Pilote</span><b>Niveau</b><em class="x">XP</em><em class="x">Courses</em><em>Vict.</em><em>Podiums</em></div>';
+  r.top.forEach((a,i)=>{ const d=document.createElement('div'); d.className='trow'+(account&&a.pseudo===account.pseudo?' moi':''); d.innerHTML='<i>'+(i+1)+'</i><span></span><b>Niv. '+levelOf(a.xp)+'</b><em class="x">'+a.xp.toLocaleString('fr-FR')+'</em><em class="x">'+a.races+'</em><em>'+a.wins+'</em><em>'+a.podiums+'</em>'; d.querySelector('span').textContent=(flagOf(a.pays)?flagOf(a.pays)+' ':'')+a.pseudo; L.appendChild(d); });
+  $('tme').textContent=r.me?(r.me.rank>r.top.length?'Ta place : '+r.me.rank+'e':''):(account?'':'Connecte-toi à un compte pour apparaître au classement.'); }
+function openTop(from){ topBack=from; show('top'); loadTop(topBy); }
+$('btop').onclick=()=>openTop('garage'); $('btop2').onclick=()=>openTop('lobby'); $('tback').onclick=()=>{ show(topBack==='lobby'&&myId?'lobby':'garage'); if(pv)pv.resize=true; };
+if(LAN){ $('btop').classList.add('hidden'); $('btop2').classList.add('hidden'); }
+$('adresse').onclick=()=>{ const url=LAN?(serverAddr||location.origin):location.origin+'/?room='+roomCode;
+  if(TOUCH&&navigator.share){ navigator.share({title:'La Grande Descente',text:LAN?'Rejoins la course':'Rejoins la salle '+roomCode,url:url}).catch(()=>{}); return; }
+  try{navigator.clipboard.writeText(url).then(()=>{$('lmsg').textContent='Lien copié, colle-le à tes amis.';});}catch(_){ $('lmsg').textContent=url; } };
+$('bacct').onclick=()=>{ renderAcct(); $('acctm').classList.remove('hidden'); }; $('acctx').onclick=()=>$('acctm').classList.add('hidden'); $('acctm').onclick=e=>{ if(e.target===$('acctm'))$('acctm').classList.add('hidden'); };
+['nom','room'].forEach(i=>$(i).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $(i).blur(); $('go').click(); } }));
+addEventListener('resize',()=>{ if(pv)pv.resize=true; });
+{ const qr=cleanCode(QS.get('room')); $('room').value=qr||''; if(qr&&!EMBED){try{history.replaceState(null,'',location.pathname);}catch(_){}} syncPlay();
+  document.querySelectorAll('#duo a, #duo2').forEach(a=>a.addEventListener('click',()=>{ const c=LAN?'':cleanCode(roomCode||$('room').value); if(c.length>=2)a.href=a.getAttribute('href').split('&room=')[0]+'&room='+c; })); }
 $('edit').onclick=()=>{editing=true; previewDirty=true; if(pv)pv.resize=true; show('garage');};
 $('again').onclick=()=>send({t:'lobby'});
 
@@ -789,7 +895,7 @@ function startRace(m){
   prevRank=null; splats=[]; fireReq=false; wheelN=0; $('pops').innerHTML=''; $('xpl').textContent=''; $('itemk').textContent=TOUCH?'ROUE':(EMBED?['Z','↑','I','G'][PN-1]:'↑')+' ROUE';
   goAt=performance.now()+(m.countdown||4000); raceT0=0; lastBeep=9; shake=0;
   $('results').classList.add('hidden'); $('finb').classList.add('hidden'); $('repair').classList.add('hidden'); $('htot').textContent=m.racers.length+(m.bots||[]).length; $('count').textContent='';
-  hudC={}; racing=true; show('race'); onResize(); toast('Circuit : '+THEMES[track.theme].nom); lastFrame=performance.now(); requestAnimationFrame(frame);
+  hudC={}; $('pause').classList.add('hidden'); racing=true; show('race'); onResize(); toast('Circuit : '+THEMES[track.theme].nom); lastFrame=performance.now(); requestAnimationFrame(frame);
 }
 function onResize(){ if(!R||!world)return; const w=innerWidth,h=innerHeight; R.setPixelRatio(Math.min(devicePixelRatio,TOUCH?1.5:2)); R.setSize(w,h,false); world.camera.aspect=w/h; world.camera.fov=w<h?82:62; world.camera.updateProjectionMatrix(); }
 addEventListener('resize',onResize); addEventListener('orientationchange',()=>setTimeout(onResize,200));

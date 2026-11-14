@@ -56,7 +56,11 @@ Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, D�
 
 ## Parties
 
-- Chaque partie a un code de 4 lettres. Le premier joueur en crée une en laissant le champ vide, les autres saisissent le code ou ouvrent le lien affiché sur la grille.
+- Chaque partie est une salle avec un nom libre (2 à 16 lettres, chiffres ou tirets). On tape un nom : la salle est créée si elle n'existe pas, sinon on la rejoint. Champ vide : salle privée au nom tiré au hasard. Le nom n'est gardé nulle part côté navigateur.
+- Un nom de salle n'est pas un mot de passe : quiconque le devine peut entrer s'il reste une place.
+- Le bouton Inviter de la grille partage un lien qui pré-remplit le nom de la salle.
+- Depuis la course : menu (ou Échap) pour abandonner et revenir à la grille, ou quitter la salle. Depuis la grille et les résultats : quitter la salle.
+- Classement général des comptes (niveau, victoires, podiums), accessible depuis l'atelier et la grille (`gd:lb:*` dans Redis).
 - 4 pilotes maximum par partie, autant de parties en parallèle que voulu.
 - L'écran partagé (`/duo?n=2` à `4`) met tous les joueurs du clavier dans la même partie.
 - Une partie inactive est effacée au bout de 2 heures.

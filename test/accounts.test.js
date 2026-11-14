@@ -83,6 +83,18 @@ await G._tick(); await sleep(200);
 const rs = h.last('state').results; assert.deepEqual(rs.map((x) => x.name.startsWith('Bot') ? 'bot' : x.name), ['Lena', 'bot', 'Martin', 'bot']); assert.equal(rs[1].bot, true); assert.equal(rs[3].time, null);
 assert.equal((await acc.me(s1.session)).account.races, before, 'aucun credit avec des bots'); assert.equal((await acc.me(s3.session)).account.races, 0);
 step('bots : classes, pilotes par l\'hote, course non creditee');
+// classement general
+const t1 = await acc.top('xp', s1.session); assert.deepEqual(t1.top.slice(0, 2).map((x) => x.pseudo), ['Hugo', 'Martin']); assert.equal(t1.me.rank, 2); assert.equal(t1.top[1].pays, 'FR');
+const t2 = await acc.top('podiums'); assert.ok(t2.top.length >= 3); assert.equal(t2.me, null); assert.equal((await acc.top('nimporte')).by, 'xp');
+assert.ok(!JSON.stringify(t1).includes('hash') && !JSON.stringify(t1).includes('salt'), 'aucune donnee secrete dans le classement');
+step('classement general par experience, victoires ou podiums');
+
+// abandon et depart de la partie
+h.say({ t: 'lobby' }); await sleep(100); h.say({ t: 'bots', v: 0 }); await sleep(80); h.say({ t: 'start' }); await sleep(150);
+g.say({ t: 'quit' }); await sleep(120); assert.deepEqual(h.last('state').racers, [1]); assert.equal(h.last('left').id, 2); assert.equal(h.last('state').players.length, 2, 'abandonner laisse le joueur dans la partie');
+h.say({ t: 'quit' }); await sleep(120); assert.equal(g.last('state').phase, 'lobby', 'plus personne en course : retour a la grille');
+g.say({ t: 'leave' }); await sleep(150); assert.equal(h.last('state').players.length, 1); assert.equal(g.readyState, 3);
+step('abandon de course et depart immediat de la partie');
 await acc.logout(s1.session); assert.equal((await acc.me(s1.session)).ok, false);
 step('deconnexion');
 console.log('\n' + ok + ' verifications reussies.'); process.exit(0);
