@@ -57,6 +57,32 @@ step('pas de double credit');
 await acc.credit({ key: 'martin', rank: 1, n: 2, score: 100, time: 50, theme: 'desert' }); await acc.credit({ key: 'martin', rank: 0, n: 1, score: 100, time: 50, theme: 'desert' });
 const m2 = (await acc.me(s1.session)).account; assert.deepEqual([m2.races, m2.wins, m2.podiums], [3, 0, 1]); assert.equal(m2.hist.length, 3);
 step('regles du podium : jamais le dernier, jamais en solo');
+// pays du pilote
+const s3 = await acc.signup('Lena', 'zzzz', 'de'); assert.equal(s3.account.pays, 'DE'); assert.equal((await acc.signup('Bad', 'zzzz', 'France')).account.pays, '');
+assert.equal((await acc.setPays(s1.session, 'fr')).account.pays, 'FR');
+step('pays enregistre sur le compte');
+
+// course avec bots : classee, mais creditee sur aucun compte
+for (const w of [a, b, c]) w.close(); await sleep(250);
+const h = new FakeWS(), g = new FakeWS();
+G.onConnection(h, 'BOTS'); h.say({ t: 'join', token: 'th', session: s1.session }); await sleep(120);
+G.onConnection(g, 'BOTS'); g.say({ t: 'join', token: 'tg', session: s3.session }); await sleep(120);
+assert.equal(h.last('state').players[0].pays, 'FR'); assert.equal(h.last('state').players[1].pays, 'DE');
+g.say({ t: 'bots', v: 3 }); await sleep(80); assert.equal(h.last('state').bots, 0, 'seul l\'hote regle les bots');
+h.say({ t: 'bots', v: 3 }); await sleep(80); assert.equal(g.last('state').bots, 3);
+h.say({ t: 'start' }); await sleep(150);
+const bots = g.last('start').bots; assert.equal(bots.length, 2, 'les bots ne prennent que les places libres'); assert.deepEqual(bots.map((x) => x.id), [-1, -2]); assert.deepEqual(bots.map((x) => x.slot), [2, 3]);
+g.say({ t: 'bpos', b: -1, x: 1, z: 30, s: 9 }); await sleep(60); assert.equal(h.last('pos'), null, 'seul l\'hote pilote les bots');
+h.say({ t: 'bpos', b: -1, x: 1, z: 30, s: 9, a: 0, d: 5, st: 0 }); h.say({ t: 'bpos', b: -9, x: 1, z: 30, s: 9 }); await sleep(60); assert.deepEqual(g.last('pos'), { t: 'pos', id: -1, x: 1, z: 30, s: 9, a: 0, d: 5, st: 0 });
+h.say({ t: 'bfinish', b: -1, time: 50 }); await sleep(80); assert.equal(g.last('finished').id, -1);
+h.say({ t: 'finish', time: 52, score: 800, hits: 1 }); g.say({ t: 'finish', time: 49, score: 950, hits: 0 }); await sleep(200);
+const before = (await acc.me(s1.session)).account.races;
+const r2 = new RedisMock(); const rm = JSON.parse(await r2.get('gd:room:BOTS')); rm.endAt = Date.now() - 1; await r2.set('gd:room:BOTS', JSON.stringify(rm));
+for (const x of G._rooms.values()) x.snap.endAt = Date.now() - 1;
+await G._tick(); await sleep(200);
+const rs = h.last('state').results; assert.deepEqual(rs.map((x) => x.name.startsWith('Bot') ? 'bot' : x.name), ['Lena', 'bot', 'Martin', 'bot']); assert.equal(rs[1].bot, true); assert.equal(rs[3].time, null);
+assert.equal((await acc.me(s1.session)).account.races, before, 'aucun credit avec des bots'); assert.equal((await acc.me(s3.session)).account.races, 0);
+step('bots : classes, pilotes par l\'hote, course non creditee');
 await acc.logout(s1.session); assert.equal((await acc.me(s1.session)).ok, false);
 step('deconnexion');
 console.log('\n' + ok + ' verifications reussies.'); process.exit(0);

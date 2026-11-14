@@ -41,7 +41,14 @@ Vercel ferme une connexion quand la fonction atteint sa durée maximale (300 sec
 - Un compte, c'est un pseudo et un code secret. Le code n'est jamais stocké, seulement son empreinte.
 - Le serveur enregistre chaque course terminée : expérience, nombre de courses, victoires, podiums et les 10 dernières courses.
 - Victoire et podium ne comptent qu'à partir de 2 pilotes, et le dernier n'est jamais sur le podium.
+- Le pays choisi à la création (modifiable ensuite) affiche le drapeau du pilote sur la grille, dans le classement en direct et sur son fanion.
 - Pas de récupération automatique d'un code oublié. Les comptes sont dans Redis (clés `gd:acct:*`).
+
+## Bots
+
+- L'hôte peut ajouter de 0 à 3 bots sur la grille ; ils prennent les places libres.
+- Ils sont pilotés par le navigateur de l'hôte, qui diffuse leurs positions aux autres joueurs.
+- Une course avec des bots est classée normalement, mais n'est créditée sur aucun compte : ni expérience, ni course, ni podium.
 
 ## Circuits
 

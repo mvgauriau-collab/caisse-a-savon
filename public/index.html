@@ -51,9 +51,11 @@ input[type=text]:focus{border-color:var(--acc)}
 .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin:0 0 14px;gap:4px}
 .seg span,.seg a{padding:9px 16px;border-radius:10px;font-weight:800;font-size:15px;color:var(--txt);text-decoration:none}
 .seg .on{background:var(--acc);color:#1a1400}
-#themes{margin:0 0 14px;flex-wrap:wrap;justify-content:center}
+#themes,#botsel{margin:0 0 14px;flex-wrap:wrap;justify-content:center;align-items:center}
+#botsel em{font-style:normal;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);padding:0 10px 0 8px}
 .acct{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;font-size:14px;font-weight:700}
 .acct input[type=text],.acct input[type=password]{font:inherit;font-weight:700;font-size:15px;padding:9px 11px;margin:0 0 8px;width:100%;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.08);color:var(--txt);outline:none;-webkit-user-select:text;user-select:text}
+.acct select{font:inherit;font-weight:700;font-size:14px;padding:8px 10px;margin:0 0 8px;width:100%;border:1px solid var(--line);border-radius:10px;background:#1a2036;color:var(--txt)}
 .acct .rang{margin:0}.acct .astuce{margin:8px 0 0}.acct b{color:var(--acc);font-size:17px}.acct .st{color:var(--mut);margin-top:4px;line-height:1.5}.acct .btn{font-size:13px;padding:7px 10px}
 .seg a:hover{background:rgba(255,255,255,.1)}
 .info{font-weight:600;color:var(--mut);margin:12px 0 0;text-align:center;min-height:20px}
@@ -176,6 +178,7 @@ body:not(.tactile) #item{left:auto;right:max(14px,env(safe-area-inset-right));bo
   <div class="brand"><h1>Grille de <span>départ</span></h1><p id="lsub">Même réseau, même adresse</p></div>
   <div class="adresse" id="adresse" title="Copier"></div>
   <div class="seg" id="themes"></div>
+  <div class="seg" id="botsel"></div>
   <div class="grille" id="grille"></div>
   <p class="info" id="lmsg"></p>
   <div class="actions">
@@ -378,7 +381,10 @@ function thumbOf(c){ c=normCfg(c); const key=JSON.stringify(c); if(THUMBS[key])r
 // LAN : page servie par serveur.py (une seule grille). Sinon : version en ligne, avec codes de partie.
 const LAN=document.documentElement.dataset.lan==='1', QS=new URLSearchParams(location.search);
 let TOKEN; try{TOKEN=sessionStorage.getItem('gdtok'+PN); if(!TOKEN){TOKEN=Math.random().toString(36).slice(2)+Date.now().toString(36); sessionStorage.setItem('gdtok'+PN,TOKEN);}}catch(_){TOKEN=Math.random().toString(36).slice(2)+Date.now().toString(36);}
-let lobbyTheme='alea';
+let lobbyTheme='alea', lobbyBots=0, raceBots=[];
+const flagOf=cc=>/^[A-Z]{2}$/.test(cc||'')?String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1)):'';
+const PAYS_CODES='AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ CA CD CF CG CH CI CK CL CM CN CO CR CU CV CW CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IM IN IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MQ MR MS MT MU MV MW MX MY MZ NA NC NE NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TG TH TJ TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
+function paysOptions(sel){ let dn=null; try{dn=new Intl.DisplayNames(['fr'],{type:'region'});}catch(_){} const L=PAYS_CODES.map(c=>[c,dn?dn.of(c):c]).sort((a,b)=>a[1].localeCompare(b[1],'fr')); return '<option value="">Pays (facultatif)</option>'+L.map(q=>'<option value="'+q[0]+'"'+(q[0]===sel?' selected':'')+'>'+flagOf(q[0])+' '+q[1]+'</option>').join(''); }
 let ws=null, myId=null, hostId=null, players=[], phase='lobby', serverAddr='', editing=false, roomCode='', wantConn=false, reconn=0;
 const cleanCode=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
 const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ'; let c=''; for(let i=0;i<4;i++)c+=A[rnd0(A.length)]; return c;};
@@ -392,12 +398,12 @@ async function api(body){ try{ const r=await fetch('/api/account',{method:'POST'
 const AERR={pseudo:'Pseudo : 3 à 14 lettres ou chiffres.',code:'Code : 4 caractères minimum.',pris:'Ce pseudo est déjà pris.',ident:'Pseudo ou code incorrect.',bloque:'Trop d\'essais, réessaie dans 10 minutes.',reseau:'Serveur injoignable.',serveur:'Erreur du serveur.',session:'Session expirée.'};
 function renderAcct(msg){ const box=$('acct'); if(LAN){box.classList.add('hidden'); return;}
   if(account){ const a=account, TN={campagne:'Campagne',desert:'Désert',hiver:'Hiver'};
-    box.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><b></b> · Niveau '+levelOf(a.xp)+'</span><button class="btn" id="aout">Déconnexion</button></div><div class="st">'+a.races+' course'+(a.races>1?'s':'')+' · '+a.wins+' victoire'+(a.wins>1?'s':'')+' · '+a.podiums+' podium'+(a.podiums>1?'s':'')+(a.hist||[]).slice(0,3).map(h=>'<br>'+(h.r===1?'1er':h.r+'e')+' sur '+h.n+' · '+(TN[h.th]||'')+' · '+fmt(h.t||0)).join('')+'</div>';
-    box.querySelector('b').textContent=a.pseudo; $('aout').onclick=async()=>{ const s0=session; setAccount(null,''); api({action:'logout',session:s0}); };
+    box.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><b></b> · Niveau '+levelOf(a.xp)+'</span><button class="btn" id="aout">Déconnexion</button></div><select id="apays2" style="margin:8px 0 0">'+paysOptions(a.pays||'')+'</select><div class="st">'+a.races+' course'+(a.races>1?'s':'')+' · '+a.wins+' victoire'+(a.wins>1?'s':'')+' · '+a.podiums+' podium'+(a.podiums>1?'s':'')+(a.hist||[]).slice(0,3).map(h=>'<br>'+(h.r===1?'1er':h.r+'e')+' sur '+h.n+' · '+(TN[h.th]||'')+' · '+fmt(h.t||0)).join('')+'</div>';
+    box.querySelector('b').textContent=(flagOf(a.pays)?flagOf(a.pays)+' ':'')+a.pseudo; $('apays2').onchange=async()=>{ const r=await api({action:'pays',session:session,pays:$('apays2').value}); if(r.ok){account=r.account; renderAcct(); if(ws&&myId)send(Object.assign({t:'car'},profile()));} }; $('aout').onclick=async()=>{ const s0=session; setAccount(null,''); api({action:'logout',session:s0}); };
   } else {
-    box.innerHTML='<input id="apseudo" type="text" maxlength="14" placeholder="Pseudo" autocomplete="username" autocapitalize="none"><input id="acode" type="password" maxlength="40" placeholder="Code secret" autocomplete="current-password"><div class="rang"><button class="btn" id="alog">Connexion</button><button class="btn" id="asign">Créer un compte</button></div><p class="astuce" id="amsg"></p>';
+    box.innerHTML='<input id="apseudo" type="text" maxlength="14" placeholder="Pseudo" autocomplete="username" autocapitalize="none"><input id="acode" type="password" maxlength="40" placeholder="Code secret" autocomplete="current-password"><select id="apays">'+paysOptions('FR')+'</select><div class="rang"><button class="btn" id="alog">Connexion</button><button class="btn" id="asign">Créer un compte</button></div><p class="astuce" id="amsg"></p>';
     $('amsg').textContent=msg||'Un compte garde ton niveau, tes courses et tes podiums. Facultatif.';
-    const go=async action=>{ $('amsg').textContent='...'; const r=await api({action:action,pseudo:$('apseudo').value,code:$('acode').value}); if(r.ok){ setAccount(r.account,r.session,action==='signup'); } else $('amsg').textContent=AERR[r.err]||'Erreur.'; };
+    const go=async action=>{ $('amsg').textContent='...'; const r=await api({action:action,pseudo:$('apseudo').value,code:$('acode').value,pays:$('apays').value}); if(r.ok){ setAccount(r.account,r.session,action==='signup'); } else $('amsg').textContent=AERR[r.err]||'Erreur.'; };
     $('alog').onclick=()=>go('login'); $('asign').onclick=()=>go('signup');
   } }
 function setAccount(a,s,fresh){ account=a; if(s!==undefined){ session=s; try{ if(s)localStorage.setItem(SKEY,s); else localStorage.removeItem(SKEY); }catch(_){} }
@@ -430,11 +436,11 @@ function onMsg(m){
   else if(m.t==='full')lost('Grille complète (4 pilotes).');
   else if(m.t==='badroom')lost('Code de partie invalide.');
   else if(m.t==='state'){
-    players=m.players; hostId=m.host; phase=m.phase; serverAddr=m.addr||''; lobbyTheme=m.theme||'alea';
+    players=m.players; hostId=m.host; phase=m.phase; serverAddr=m.addr||''; lobbyTheme=m.theme||'alea'; lobbyBots=m.bots||0; if(m.raceBots)raceBots=m.raceBots;
     players.forEach(p=>{p.cfg=normCfg(p.cfg);});
     if(phase==='lobby'){racing=false; $('results').classList.add('hidden'); if(!editing)show('lobby');}
     else if(phase==='results'){ if(racing)showResults(m.results); else show('lobby'); }
-    else if(phase==='race'&&m.seed&&(m.racers||[]).includes(myId)&&(!racing||!track||track.seed!==m.seed)) startRace({seed:m.seed,racers:m.racers,theme:m.raceTheme,countdown:Math.max(0,4000-((m.now||0)-(m.startedAt||0)))});
+    else if(phase==='race'&&m.seed&&(m.racers||[]).includes(myId)&&(!racing||!track||track.seed!==m.seed)) startRace({seed:m.seed,racers:m.racers,theme:m.raceTheme,bots:m.raceBots,countdown:Math.max(0,4000-((m.now||0)-(m.startedAt||0)))});
     else if(phase==='race'&&!racing&&!(m.racers||[]).includes(myId)) show('lobby');
     renderLobby();
   }
@@ -450,15 +456,16 @@ const nameOf=id=>{const p=players.find(p=>p.id===id); return p?p.name:'';};
 function renderLobby(){
   const g=$('grille'); g.innerHTML='';
   for(let s=0;s<4;s++){const p=players.find(p=>p.slot===s); const b=document.createElement('div');
-    if(!p){b.className='box vide'; b.textContent='Place libre';}
+    if(!p){b.className='box vide'; const libres=[0,1,2,3].filter(k=>!players.some(q=>q.slot===k)); b.textContent=libres.indexOf(s)<lobbyBots?'🤖 Bot':'Place libre';}
     else{b.className='box'; b.innerHTML='<div class="num" style="background:'+p.color+'">'+(s+1)+'</div><img alt=""><div class="nom"></div>'+(p.id===hostId?'<span class="tag">HÔTE</span>':'')+(p.id===myId?'<span class="tag moi">TOI</span>':'')+(p.acct?'<span class="tag moi">NIV. '+levelOf(p.xp||0)+'</span>':'');
-      b.querySelector('img').src=thumbOf(p.cfg); b.querySelector('.nom').textContent=p.name;}
+      b.querySelector('img').src=thumbOf(p.cfg); b.querySelector('.nom').textContent=(flagOf(p.pays)?flagOf(p.pays)+' ':'')+p.name;}
     g.appendChild(b);}
   $('adresse').textContent=LAN?(serverAddr||location.origin):location.host+'/?room='+roomCode; $('lsub').textContent=LAN?'Même réseau, même adresse':'Partage ce lien, ou le code '+roomCode;
   const host=myId===hostId, busy=phase!=='lobby';
   const tb=$('themes'); tb.innerHTML=''; [['alea','Au hasard'],['campagne','Campagne'],['desert','Désert'],['hiver','Hiver']].forEach(q=>{ const el=document.createElement(host&&!busy?'a':'span'); el.textContent=q[1]; if(q[0]===lobbyTheme)el.className='on'; else if(!host||busy)el.style.opacity=.45; if(host&&!busy){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'theme',v:q[0]});};} tb.appendChild(el); });
+  { const bb=$('botsel'), maxB=Math.max(0,4-players.length); bb.innerHTML='<em>Bots</em>'; for(let k=0;k<=3;k++){ const ok=host&&!busy&&k<=maxB, el=document.createElement(ok?'a':'span'); el.textContent=String(k); if(k===Math.min(lobbyBots,maxB))el.className='on'; else if(!ok)el.style.opacity=.4; if(ok){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'bots',v:k});};} bb.appendChild(el); } }
   $('start').classList.toggle('hidden',!host||busy);
-  $('lmsg').textContent=busy?'Manche en cours, tu pars à la prochaine.':host?'Tu es l\'hôte ('+players.length+'/4 pilotes).':'L\'hôte donne le départ...';
+  $('lmsg').textContent=busy?'Manche en cours, tu pars à la prochaine.':(host?'Tu es l\'hôte ('+players.length+'/4 pilotes).':'L\'hôte donne le départ...')+(lobbyBots>0?' Avec des bots, la course ne compte pas dans l\'historique.':'');
   $('again').classList.toggle('hidden',!host); $('rmsg').textContent=host?'':'L\'hôte relance la manche...';
 }
 $('start').onclick=()=>{audioInit(); send({t:'start'});};
@@ -772,13 +779,16 @@ function startRace(m){
   const mkDot=(col,moi)=>{const d=document.createElement('div'); d.className='dot'+(moi?' moi':''); d.style.background=col; $('dots').appendChild(d); return d;};
   m.racers.forEach(id=>{const p=players.find(p=>p.id===id); if(!p)return;
     if(id===myId){mySlot=p.slot; myColor=p.color;}
-    else {const o=others[id]={id:id,x:lanes[p.slot],s:8,nx:lanes[p.slot],ns:8,v:0,a:0,na:0,d:0,nd:0,st:0,nst:0,rep:0,fin:null,got:false,name:p.name,color:p.color,car:null,dot:mkDot(p.color,false)};
-      o.car=buildCar(p.cfg); const fl=nameFlag(p.name,p.color); o.car.root.add(fl); o.car.mats.push(fl.material); world.scene.add(o.car.root);}});
+    else {const o=others[id]={id:id,flag:flagOf(p.pays),x:lanes[p.slot],s:8,nx:lanes[p.slot],ns:8,v:0,a:0,na:0,d:0,nd:0,st:0,nst:0,rep:0,fin:null,got:false,name:p.name,color:p.color,car:null,dot:mkDot(p.color,false)};
+      o.car=buildCar(p.cfg); const fl=nameFlag((o.flag?o.flag+' ':'')+p.name,p.color); o.car.root.add(fl); o.car.mats.push(fl.material); world.scene.add(o.car.root);}});
+  raceBots=m.bots||[];
+  raceBots.forEach(b=>{ const o=others[b.id]={id:b.id,bot:true,flag:'🤖',x:lanes[b.slot],s:8,nx:lanes[b.slot],ns:8,v:0,a:0,na:0,d:0,nd:0,st:0,nst:0,rep:0,fin:null,got:true,name:b.name,color:b.color,car:null,dot:mkDot(b.color,false),b:null};
+    o.car=buildCar(b.cfg); const fl=nameFlag('🤖 '+b.name,b.color); o.car.root.add(fl); o.car.mats.push(fl.material); world.scene.add(o.car.root); });
   myCar=buildCar(cfg); world.scene.add(myCar.root);
   me={x:lanes[mySlot],s:8,v:0,steer:0,air:0,vy:0,slip:0,drift:0,mud:0,wall:0,bump:0,fin:null,dmg:0,clean:0,repair:0,dot:mkDot(myColor,true),nod:0,score:0,hits:0,item:true,pull:Math.random()<.5?-1:1,jolt:1,kick:0,turbo:0,crashed:false,maxed:false,xpDone:false};
   prevRank=null; splats=[]; fireReq=false; wheelN=0; $('pops').innerHTML=''; $('xpl').textContent=''; $('itemk').textContent=TOUCH?'ROUE':(EMBED?['Z','↑','I','G'][PN-1]:'↑')+' ROUE';
   goAt=performance.now()+(m.countdown||4000); raceT0=0; lastBeep=9; shake=0;
-  $('results').classList.add('hidden'); $('finb').classList.add('hidden'); $('repair').classList.add('hidden'); $('htot').textContent=m.racers.length; $('count').textContent='';
+  $('results').classList.add('hidden'); $('finb').classList.add('hidden'); $('repair').classList.add('hidden'); $('htot').textContent=m.racers.length+(m.bots||[]).length; $('count').textContent='';
   hudC={}; racing=true; show('race'); onResize(); toast('Circuit : '+THEMES[track.theme].nom); lastFrame=performance.now(); requestAnimationFrame(frame);
 }
 function onResize(){ if(!R||!world)return; const w=innerWidth,h=innerHeight; R.setPixelRatio(Math.min(devicePixelRatio,TOUCH?1.5:2)); R.setSize(w,h,false); world.camera.aspect=w/h; world.camera.fov=w<h?82:62; world.camera.updateProjectionMatrix(); }
@@ -792,9 +802,11 @@ function showResults(res){
   const best=Math.max(0,...res.map(r=>r.score||0)), crash=Math.max(0,...res.map(r=>r.hits||0)), clean=Math.min(...res.map(r=>r.time==null?99:(r.hits||0)));
   res.forEach((r,i)=>{const d=document.createElement('div'); d.className='ligne'+(r.id===myId?' moi':''); const p=players.find(p=>p.id===r.id);
     let aw=''; if(res.length>1){ if(best>0&&(r.score||0)===best)aw+='<span class="aw">STYLE</span>'; if(crash>2&&(r.hits||0)===crash)aw+='<span class="aw">CASSE-COU</span>'; else if(r.time!=null&&(r.hits||0)===clean&&clean<=1)aw+='<span class="aw">PROPRE</span>'; }
+    const bq=r.bot?raceBots.find(b=>b.id===r.id):null; if(r.bot)aw='<span class="aw">BOT</span>';
     d.innerHTML='<span class="rg">'+(r.time==null?'':MED[i])+'</span><img alt=""><span class="nm"></span>'+aw+'<span class="tp">'+(r.time==null?'pas arrivé':fmt(r.time))+'</span><span class="pts">'+(r.score||0).toLocaleString('fr-FR')+' pts</span>';
-    if(p)d.querySelector('img').src=thumbOf(p.cfg); d.querySelector('.nm').textContent=r.name; l.appendChild(d);});
-  if(me&&!me.xpDone&&account){ me.xpDone=true; const before=levelOf(account.xp), L=levelOf(account.xp+me.score); $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP sur ton compte · Niveau '+L+(L>before?' · Niveau supérieur !':''); setTimeout(refreshAccount,2500); }
+    if(p)d.querySelector('img').src=thumbOf(p.cfg); else if(bq)d.querySelector('img').src=thumbOf(bq.cfg); d.querySelector('.nm').textContent=(p&&flagOf(p.pays)?flagOf(p.pays)+' ':'')+r.name; l.appendChild(d);});
+  if(me&&!me.xpDone&&res.some(r=>r.bot)){ me.xpDone=true; $('xpl').textContent='Course avec bots : non comptée dans l\'historique'; }
+  else if(me&&!me.xpDone&&account){ me.xpDone=true; const before=levelOf(account.xp), L=levelOf(account.xp+me.score); $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP sur ton compte · Niveau '+L+(L>before?' · Niveau supérieur !':''); setTimeout(refreshAccount,2500); }
   else if(me&&!me.xpDone){me.xpDone=true; const before=levelOf(getXP()), xp=getXP()+me.score; try{localStorage.setItem('xp',String(xp));}catch(_){} const L=levelOf(xp);
     $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP · Niveau '+L+(L>before?' · Niveau supérieur !':''); showLevel();}
   $('results').classList.remove('hidden');
@@ -943,7 +955,7 @@ function update(dt,now){
   me.nod*=Math.pow(.01,dt);
   // --- pose de ma caisse
   poseCar(myCar,me.s,me.x,me.air,me.steer,me.v,me.dmg,me.vy,now,dt,me.nod);
-  for(const id in others){const o=others[id]; o.ns+=o.v*dt; o.s+=o.v*dt; o.s+=(o.ns-o.s)*Math.min(1,dt*6); o.x+=(o.nx-o.x)*Math.min(1,dt*10); o.a+=(o.na-o.a)*Math.min(1,dt*14); o.st+=(o.nst-o.st)*Math.min(1,dt*10); o.d=o.nd;
+  for(const id in others){const o=others[id]; if(o.bot&&myId===hostId)botStep(o,dt,now,go); else { o.ns+=o.v*dt; o.s+=o.v*dt; o.s+=(o.ns-o.s)*Math.min(1,dt*6); o.x+=(o.nx-o.x)*Math.min(1,dt*10); o.a+=(o.na-o.a)*Math.min(1,dt*14); o.st+=(o.nst-o.st)*Math.min(1,dt*10); o.d=o.nd; }
     if(o.car)poseCar(o.car,o.s,o.x,o.a,o.st,o.v,o.d,0,now,dt,0);}
   // --- debris
   for(const d of world.debris){ d.life-=dt; d.s+=d.vs*dt; d.vy-=14*dt; const p=d.o.position; fr(d.s,F2); p.x+=(F2.rx*d.vx+Math.sin(F2.th)*d.vs)*dt; p.z+=(F2.rz*d.vx+Math.cos(F2.th)*d.vs)*dt; p.y+=d.vy*dt;
@@ -964,7 +976,37 @@ function update(dt,now){
   else if(tr.theme==='desert'&&Math.random()<dt*16){ fr(me.s+6+Math.random()*40,F2); const lx=(Math.random()-.5)*14; puff(F2.x+F2.rx*lx,F2.y+.25,F2.z+F2.rz*lx,1,0xe6cb94,{v:2.5,up:.7,g:.3,size:.11,life:2.2,fx:3,spread:0}); }
   const cp=myCar.root.position; world.sun.position.set(cp.x+34,cp.y+60,cp.z+22); world.sun.target.position.copy(cp); const sd=world.scene.userData.sunDisc; if(sd)sd.position.set(cam.position.x+34*14,cam.position.y+60*8,cam.position.z+22*14);
   if(rollGain){rollGain.gain.value=muted||me.air>0?0:Math.min(.2,sp*.2); rollFilter.frequency.value=180+sp*1300+hot*500;}
-  if(now-lastSend>66){lastSend=now; send({t:'pos',x:+me.x.toFixed(2),z:+me.s.toFixed(2),s:+(go?me.v:0).toFixed(2),a:+me.air.toFixed(2),d:Math.round(me.dmg),st:+me.steer.toFixed(2),r:me.repair>0?1:0});}
+  if(now-lastSend>66){lastSend=now; if(myId===hostId)for(const id in others){const o=others[id]; if(o.bot)send({t:'bpos',b:o.id,x:+o.x.toFixed(2),z:+o.s.toFixed(2),s:+o.v.toFixed(2),a:+o.a.toFixed(2),d:Math.round(o.d),st:+(o.st||0).toFixed(2)});} send({t:'pos',x:+me.x.toFixed(2),z:+me.s.toFixed(2),s:+(go?me.v:0).toFixed(2),a:+me.air.toFixed(2),d:Math.round(me.dmg),st:+me.steer.toFixed(2),r:me.repair>0?1:0});}
+}
+// Bots : pilotes par le navigateur de l'hote, qui diffuse leurs positions aux autres joueurs.
+const FB={};
+function botStep(o,dt,now,go){
+  const tr=track, B=o.b||(o.b={steer:0,vy:0,tx:o.x,skill:.84+(((-o.id)*37)%13)/100,next:0,fin:false,hitT:0,rep:0}); if(!go)return;
+  fr(o.s,FB); const sp=o.v/MAXV;
+  if(now>B.next){ B.next=now+110; const b=Math.floor(o.s/DS); let best=o.x,bs=-1e9;       // choix de trajectoire
+    for(let lane=-3.3;lane<=3.31;lane+=.55){ let sc=-Math.abs(lane-o.x)*.35-Math.abs(lane)*.05;
+      for(let k=1;k<14;k++){const os=tr.buckets[b+k]; if(!os)continue; for(const q of os){ if(q.hit||q.type==='bosse')continue; if(q.type==='tremplin'){if(Math.abs(q.x-lane)<.9)sc+=1.5; continue;} if(Math.abs(q.x-lane)<q.hw+1.0)sc-=26/k; }}
+      for(const p of tr.patches){ const ds=p.s-o.s; if(ds>-p.rs&&ds<16&&Math.abs(lane-p.x)<p.rx+.4)sc+=p.type==='turbo'?2.5:p.type==='eau'?0:-2.2; }
+      for(const g of tr.gates){ const ds=g.s-o.s; if(ds>0&&ds<22&&Math.abs(lane-g.x)<.6)sc+=1.2; }
+      if(sc>bs){bs=sc;best=lane;} }
+    B.tx=best+Math.sin(now*.0007+o.id)*.5*(1.15-B.skill); }
+  B.steer+=(clamp((B.tx-o.x)*1.6,-1,1)-B.steer)*Math.min(1,dt*7);
+  if(B.rep>0){ B.rep-=dt; o.v=Math.max(0,o.v-20*dt); if(B.rep<=0)o.d=25; }
+  else { o.x+=B.steer*dt*5.4*(o.a>0?.3:1)*(.5+.5*Math.min(1,sp))*Math.min(1,o.v/2.5)*THEMES[tr.theme].grip*(1-.3*o.d/100);
+    if(o.a<=0)o.x+=dt*FB.k*o.v*o.v*.2*(1-Math.min(.55,Math.abs(FB.b)*2.4));
+    let a=(GEFF*FB.slope-CD*(1+o.d/100*.9)*o.v*o.v-.2)*B.skill; if(o.a>0)a=-CD*o.v*o.v*.4;
+    if(o.a<=0)for(const p of tr.patches){ const u=(o.s-p.s)/(p.rs+.4), w=(o.x-p.x)/(p.rx+.35); if(u*u+w*w<1){ if(p.type==='turbo'){ if(now-(p.usedB||0)>1500){p.usedB=now; o.v+=5;} } else if(p.type==='savon')o.x+=Math.sin(now*.009+o.id)*2.2*sp*dt; else a-=o.v*2.3; } }
+    if(B.fin)a=-1.2; o.v+=a*dt; o.v=Math.min(Math.max(o.v,B.fin?9:3.2),MAXV*1.05); }
+  const prevS=o.s; o.s=Math.min(o.s+o.v*dt,tr.wallS-1.3); if(o.s>=tr.wallS-1.35)o.v=0;
+  if(o.a>0||B.vy>0){ o.a+=B.vy*dt; B.vy-=14*dt; if(o.a<=0){o.a=0;B.vy=0;} }
+  if(Math.abs(o.x)>EDGE){ o.x=Math.sign(o.x)*EDGE; if(now-B.hitT>500){B.hitT=now; o.v*=.62; o.d=Math.min(100,o.d+9);} }
+  const nose=1.1; for(let b=Math.floor((prevS+nose)/DS);b<=Math.floor((o.s+nose)/DS)&&b<tr.N;b++){ const os=tr.buckets[b]; if(!os)continue; for(const q of os){ if(q.hit||q.s<prevS+nose||q.s>o.s+nose)continue; const dx=Math.abs(q.x-o.x);
+    if(q.type==='tremplin'){ if(dx<q.hw&&o.a<=0){B.vy=2.4+o.v*.27; o.a=.01;} continue; } if(q.type==='bosse'){ if(o.a<=0){B.vy=1.7+o.v*.1; o.a=.01;} continue; }
+    if(o.a>.7||dx>=q.hw+CARHW)continue; send({t:'hit',i:q.idx}); explode(q,o.v,Math.sign(q.x-o.x)); o.v*=q.type==='cone'?.82:.45; o.d=Math.min(100,o.d+(q.type==='cone'?3:14)); } }
+  if(o.d>=100&&B.rep<=0&&!B.fin)B.rep=2.8;
+  for(const w of world.wheels){ if(w.dead||w.off||B.fin)continue; if(Math.abs(w.s-o.s)<1.5&&Math.abs(w.x-o.x)<1.05&&o.a<.6){ send({t:'whit',w:w.wid,o:w.owner}); if(w.owner===myId)addScore(200,'Touché'); killWheel(w,true); o.d=Math.min(100,o.d+22); o.v*=.55; } }
+  if(!B.fin&&o.s>=tr.finishS){ B.fin=true; o.fin=(now-raceT0)/1000; send({t:'bfinish',b:o.id,time:o.fin}); }
+  o.ns=o.s; o.nx=o.x; o.na=o.a; o.nd=o.d; o.st=o.nst=B.steer;
 }
 function poseCar(car,s,x,air,steer,v,dmg,vy,now,dt,nod){
   fr(s,F2); const r=car.root; r.position.set(F2.x+F2.rx*x,F2.y+air+x*F2.b,F2.z+F2.rz*x); r.rotation.order='YXZ'; r.rotation.z=-Math.atan(F2.b);
@@ -984,7 +1026,7 @@ function hud(now){
   all.sort((a,b)=>(a.fin!=null&&b.fin!=null)?a.fin-b.fin:a.fin!=null?-1:b.fin!=null?1:b.s-a.s);
   const rank=all.findIndex(a=>a.id===myId); setTxt('hpos',String(rank+1)); setTxt('hsuf',rank===0?'er':'e');
   const sig=all.map(a=>a.id+(a.fin!=null?'f':'')).join(','); if(hudC.board!==sig){ hudC.board=sig; const B=$('board'); B.innerHTML='';
-    all.forEach((a,i)=>{ const o=others[a.id], d=document.createElement('div'); d.className='brow'+(a.id===myId?' moi':'')+(a.fin!=null?' fin':''); d.innerHTML='<i>'+(i+1)+'</i><u></u><span></span>'; d.querySelector('u').style.background=a.id===myId?myColor:(o?o.color:'#888'); d.querySelector('span').textContent=a.id===myId?(nameOf(myId)||'Toi'):(o?o.name:''); B.appendChild(d); }); }
+    all.forEach((a,i)=>{ const o=others[a.id], d=document.createElement('div'); d.className='brow'+(a.id===myId?' moi':'')+(a.fin!=null?' fin':''); d.innerHTML='<i>'+(i+1)+'</i><u></u><span></span>'; d.querySelector('u').style.background=a.id===myId?myColor:(o?o.color:'#888'); const fg=a.id===myId?flagOf(account&&account.pays):(o?o.flag:''); d.querySelector('span').textContent=(fg?fg+' ':'')+(a.id===myId?(nameOf(myId)||'Toi'):(o?o.name:'')); B.appendChild(d); }); }
   if(prevRank!=null&&rank<prevRank&&raceT0&&me.fin==null&&now-raceT0>2500){addScore(150,'Dépassement'); toast(rank===0?'Tu prends la tête':'Tu passes '+(rank+1)+'e');} prevRank=rank;
   setTxt('hpts',me.score.toLocaleString('fr-FR')+' pts'); if(hudC.item!==me.item){hudC.item=me.item; $('item').classList.toggle('hidden',!me.item);}
   const tb=me.clean>=7&&me.fin==null; if(hudC.tb!==tb){hudC.tb=tb; $('hud').classList.toggle('turbo',tb);}

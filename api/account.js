@@ -1,4 +1,4 @@
-// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg', ... }
+// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg' | 'pays', ... }
 import { createAccounts } from '../lib/accounts.js';
 import { makeStore } from '../lib/store.js';
 
@@ -7,7 +7,8 @@ const accounts = createAccounts(await makeStore());
 export async function handleAccount(body) {
   const b = body && typeof body === 'object' ? body : {};
   switch (b.action) {
-    case 'signup': return accounts.signup(b.pseudo, b.code);
+    case 'signup': return accounts.signup(b.pseudo, b.code, b.pays);
+    case 'pays': return accounts.setPays(b.session, b.pays);
     case 'login': return accounts.login(b.pseudo, b.code);
     case 'me': return accounts.me(b.session);
     case 'logout': return accounts.logout(b.session);
