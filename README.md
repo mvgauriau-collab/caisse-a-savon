@@ -15,7 +15,7 @@ Course de caisses à savon multijoueur. Cette version se déploie sur Vercel : l
 
 1. Mets ce dossier dans un dépôt GitHub (privé ou public).
 2. Sur vercel.com, crée un projet à partir de ce dépôt. Aucun réglage de build à changer.
-3. Ajoute une base Redis au projet depuis le Marketplace Vercel (rubrique stockage du projet). Elle doit fournir une variable d'environnement `REDIS_URL` de la forme `redis://...` ou `rediss://...`. Si la variable porte un autre nom, crée `REDIS_URL` avec la même valeur.
+3. Ajoute une base Redis au projet depuis le Marketplace Vercel (rubrique stockage du projet). Upstash propose une offre gratuite. Le jeu lit `REDIS_URL` (ou `KV_URL`), et à défaut reconstruit l'adresse à partir des variables Upstash `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN` (ou `KV_REST_API_URL` et `KV_REST_API_TOKEN`).
 4. Redéploie pour que la fonction voie la variable.
 5. Ouvre l'adresse du projet : c'est prêt.
 
