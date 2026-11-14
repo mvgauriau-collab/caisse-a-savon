@@ -61,7 +61,7 @@ Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, D�
 - Le bouton Inviter de la grille partage un lien qui pré-remplit le nom de la salle.
 - Depuis la course : menu (ou Échap) pour abandonner et revenir à la grille, ou quitter la salle. Depuis la grille et les résultats : quitter la salle.
 - Classement général des comptes (niveau, victoires, podiums), accessible depuis l'atelier et la grille (`gd:lb:*` dans Redis).
-- 4 pilotes maximum par partie, autant de parties en parallèle que voulu.
+- 8 pilotes maximum par salle (humains et bots confondus, départ sur deux lignes), autant de salles en parallèle que voulu. L'écran partagé sur un clavier reste limité à 4.
 - L'écran partagé (`/duo?n=2` à `4`) met tous les joueurs du clavier dans la même partie.
 - Une partie inactive est effacée au bout de 2 heures.
 

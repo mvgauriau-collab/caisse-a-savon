@@ -71,7 +71,7 @@ assert.equal(h.last('state').players[0].pays, 'FR'); assert.equal(h.last('state'
 g.say({ t: 'bots', v: 3 }); await sleep(80); assert.equal(h.last('state').bots, 0, 'seul l\'hote regle les bots');
 h.say({ t: 'bots', v: 3 }); await sleep(80); assert.equal(g.last('state').bots, 3);
 h.say({ t: 'start' }); await sleep(150);
-const bots = g.last('start').bots; assert.equal(bots.length, 2, 'les bots ne prennent que les places libres'); assert.deepEqual(bots.map((x) => x.id), [-1, -2]); assert.deepEqual(bots.map((x) => x.slot), [2, 3]);
+const bots = g.last('start').bots; assert.equal(bots.length, 3, 'les bots ne prennent que les places libres'); assert.deepEqual(bots.map((x) => x.id), [-1, -2, -3]); assert.deepEqual(bots.map((x) => x.slot), [2, 3, 4]);
 g.say({ t: 'bpos', b: -1, x: 1, z: 30, s: 9 }); await sleep(60); assert.equal(h.last('pos'), null, 'seul l\'hote pilote les bots');
 h.say({ t: 'bpos', b: -1, x: 1, z: 30, s: 9, a: 0, d: 5, st: 0 }); h.say({ t: 'bpos', b: -9, x: 1, z: 30, s: 9 }); await sleep(60); assert.deepEqual(g.last('pos'), { t: 'pos', id: -1, x: 1, z: 30, s: 9, a: 0, d: 5, st: 0 });
 h.say({ t: 'bfinish', b: -1, time: 50 }); await sleep(80); assert.equal(g.last('finished').id, -1);
@@ -80,7 +80,7 @@ const before = (await acc.me(s1.session)).account.races;
 const r2 = new RedisMock(); const rm = JSON.parse(await r2.get('gd:room:BOTS')); rm.endAt = Date.now() - 1; await r2.set('gd:room:BOTS', JSON.stringify(rm));
 for (const x of G._rooms.values()) x.snap.endAt = Date.now() - 1;
 await G._tick(); await sleep(200);
-const rs = h.last('state').results; assert.deepEqual(rs.map((x) => x.name.startsWith('Bot') ? 'bot' : x.name), ['Lena', 'bot', 'Martin', 'bot']); assert.equal(rs[1].bot, true); assert.equal(rs[3].time, null);
+const rs = h.last('state').results; assert.deepEqual(rs.map((x) => x.name.startsWith('Bot') ? 'bot' : x.name), ['Lena', 'bot', 'Martin', 'bot', 'bot']); assert.equal(rs[1].bot, true); assert.equal(rs[3].time, null);
 assert.equal((await acc.me(s1.session)).account.races, before, 'aucun credit avec des bots'); assert.equal((await acc.me(s3.session)).account.races, 0);
 step('bots : classes, pilotes par l\'hote, course non creditee');
 // classement general

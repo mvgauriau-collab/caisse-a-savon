@@ -63,9 +63,9 @@ step('classement trie par temps avec les points');
 
 // 6. retour a la grille, partie pleine, nettoyage
 a.say({ t: 'lobby' }); await sleep(120); assert.equal(b2.last('state').phase, 'lobby');
-const extra = []; for (let i = 0; i < 3; i++) { const w = new FakeWS(); (i % 2 ? A : B).onConnection(w, 'TEST'); w.say({ t: 'join', token: 'x' + i, name: 'P' + i }); extra.push(w); await sleep(120); }
-assert.equal(a.last('state').players.length, 4); assert.ok(extra[2].last('full'), 'le 5e joueur est refuse');
-step('partie limitee a 4 pilotes');
+const extra = []; for (let i = 0; i < 7; i++) { const w = new FakeWS(); (i % 2 ? A : B).onConnection(w, 'TEST'); w.say({ t: 'join', token: 'x' + i, name: 'P' + i }); extra.push(w); await sleep(120); }
+assert.equal(a.last('state').players.length, 8); assert.ok(extra[6].last('full'), 'le 9e joueur est refuse'); assert.deepEqual(a.last('state').players.map((x) => x.slot), [0, 1, 2, 3, 4, 5, 6, 7]);
+step('partie limitee a 8 pilotes');
 const bad = new FakeWS(); A.onConnection(bad, 'a b'); assert.ok(bad.last('badroom'));
 for (const w of [a, b2, ...extra]) w.close(); await sleep(300);
 assert.equal(A._rooms.size, 0); assert.equal(B._rooms.size, 0);
