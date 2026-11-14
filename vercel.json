@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "functions": {
+    "api/ws.js": { "maxDuration": 300 }
+  },
+  "headers": [
+    { "source": "/three.module.min.js", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] }
+  ]
+}

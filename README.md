@@ -1,1 +1,50 @@
-# caisse-a-savon
+# La Grande Descente, version Vercel
+
+Course de caisses à savon multijoueur. Cette version se déploie sur Vercel : les joueurs ouvrent un lien, sans serveur à lancer.
+
+## Ce qu'il y a dans le dossier
+
+- `public/` : le jeu (page principale, écran partagé, moteur 3D embarqué). Servi tel quel.
+- `api/ws.js` : la fonction Vercel qui tient les connexions WebSocket (`/api/ws`).
+- `lib/game.js` : les règles des parties (salons, départ, arrivées, classement).
+- `lib/store.js` : l'état partagé entre instances, dans Redis.
+- `dev-server.js` : pour jouer en local sans Vercel.
+- `test/` : vérifie que deux instances se coordonnent bien.
+
+## Mise en ligne
+
+1. Mets ce dossier dans un dépôt GitHub (privé ou public).
+2. Sur vercel.com, crée un projet à partir de ce dépôt. Aucun réglage de build à changer.
+3. Ajoute une base Redis au projet depuis le Marketplace Vercel (rubrique stockage du projet). Elle doit fournir une variable d'environnement `REDIS_URL` de la forme `redis://...` ou `rediss://...`. Si la variable porte un autre nom, crée `REDIS_URL` avec la même valeur.
+4. Redéploie pour que la fonction voie la variable.
+5. Ouvre l'adresse du projet : c'est prêt.
+
+Les WebSockets demandent « Fluid compute », activé par défaut sur les projets récents.
+
+## Pourquoi Redis
+
+Vercel peut répartir les joueurs d'une même partie sur plusieurs instances de la fonction. Sans stockage commun, ils ne se verraient pas. Redis porte donc l'état de chaque partie et relaie les messages d'une instance à l'autre.
+
+Quand tous les joueurs d'une partie sont sur la même instance, ce qui est le cas le plus courant, les positions ne passent pas par Redis : seuls les changements d'état (arrivée d'un joueur, départ, arrivées, classement) y sont écrits.
+
+Sans `REDIS_URL`, le jeu démarre quand même avec un état en mémoire, mais ce n'est fiable qu'en local.
+
+## Coupure des connexions
+
+Vercel ferme une connexion quand la fonction atteint sa durée maximale (300 secondes ici, réglable dans `vercel.json` selon l'offre). Le jeu se reconnecte tout seul et le joueur garde sa place, sa caisse et sa course en cours. Un joueur qui ne revient pas au bout de 20 secondes est retiré de la partie.
+
+## Parties
+
+- Chaque partie a un code de 4 lettres. Le premier joueur en crée une en laissant le champ vide, les autres saisissent le code ou ouvrent le lien affiché sur la grille.
+- 4 pilotes maximum par partie, autant de parties en parallèle que voulu.
+- L'écran partagé (`/duo?n=2` à `4`) met tous les joueurs du clavier dans la même partie.
+- Une partie inactive est effacée au bout de 2 heures.
+
+## En local
+
+```
+npm install
+npm run dev          # http://localhost:3000
+npm test             # deux instances simulées, Redis simulé
+COUPURE=20 npm run dev   # coupe chaque connexion après 20 s, pour voir la reconnexion
+```

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La Grande Descente · écran partagé</title>
+<style>
+html,body{margin:0;height:100%;background:#0b1020;color:#f4f6fb;font-family:ui-rounded,"SF Pro Rounded","Avenir Next","Segoe UI",system-ui,sans-serif;overflow:hidden}
+.bar{height:36px;display:flex;align-items:center;gap:14px;font-size:12px;font-weight:700;color:#9aa3b8;padding:0 12px;white-space:nowrap;overflow:hidden}
+.bar b{color:#ffd23f}.bar .sp{flex:1}
+.seg{display:inline-flex;background:rgba(255,255,255,.07);border-radius:9px;padding:2px;gap:2px}
+.seg a{padding:4px 10px;border-radius:7px;color:#f4f6fb;text-decoration:none;font-weight:800}
+.seg a.on{background:#ffd23f;color:#1a1400}
+.split{display:grid;gap:3px;height:calc(100% - 36px);background:#000;grid-template-columns:1fr 1fr}
+.split.n3,.split.n4{grid-template-rows:1fr 1fr}
+iframe{width:100%;height:100%;border:0;display:block;background:#0b1020}
+</style>
+</head>
+<body>
+<div class="bar"><div class="seg" id="seg"></div><span id="leg"></span><span class="sp"></span></div>
+<div class="split" id="split"></div>
+<script>
+// Ecran partage : jusqu'a 4 joueurs sur un seul clavier. Les touches sont lues ici (ou remontees
+// par les cadres) puis envoyees au bon joueur. On se base sur la position physique des touches
+// (ZQSD sur un clavier francais = codes W A S D).
+var QS=new URLSearchParams(location.search), N=Math.max(2,Math.min(4,parseInt(QS.get('n'),10)||2));
+// En ligne, tous les cadres rejoignent la meme partie : on reprend le code de l'adresse ou on en cree un.
+var LAN=document.documentElement.getAttribute('data-lan')==='1', ROOM='';
+if(!LAN){ROOM=String(QS.get('room')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); if(ROOM.length<3){var AL='ABCDEFGHJKLMNPQRSTUVWXYZ'; ROOM=''; for(var q=0;q<4;q++)ROOM+=AL[Math.floor(Math.random()*AL.length)];} try{history.replaceState(null,'','?n='+N+'&room='+ROOM);}catch(e){}}
+var RQ=ROOM?'&room='+ROOM:'';
+var LEG=['Q D · Z roue','← → · ↑ roue','J L · I roue','V N · G roue (ou pavé 4 6 · 8)'];
+var seg=document.getElementById('seg'); seg.innerHTML='<a href="/'+(ROOM?'?room='+ROOM:'')+'">Solo</a>'+[2,3,4].map(function(k){return '<a href="/duo?n='+k+RQ+'"'+(k===N?' class="on"':'')+'>'+k+' joueurs</a>';}).join('');
+var leg=''; for(var i=0;i<N;i++)leg+='<b>J'+(i+1)+'</b> '+LEG[i]+(i<N-1?' &nbsp;·&nbsp; ':''); if(ROOM)leg='<b>Partie '+ROOM+'</b> &nbsp;·&nbsp; '+leg; document.getElementById('leg').innerHTML=leg;
+var split=document.getElementById('split'); split.className='split n'+N; var cadres=[];
+for(var j=0;j<N;j++){var f=document.createElement('iframe'); f.src='/?p='+(j+1)+RQ; split.appendChild(f); cadres.push(f);}
+var map={KeyA:[0,'l'],KeyD:[0,'r'],KeyW:[0,'fire'],
+         ArrowLeft:[1,'l'],ArrowRight:[1,'r'],ArrowUp:[1,'fire'],
+         KeyJ:[2,'l'],KeyL:[2,'r'],KeyI:[2,'fire'],
+         KeyV:[3,'l'],KeyN:[3,'r'],KeyG:[3,'fire'],Numpad4:[3,'l'],Numpad6:[3,'r'],Numpad8:[3,'fire']};
+function route(code,down){var m=map[code]; if(!m||!cadres[m[0]])return false; cadres[m[0]].contentWindow.postMessage({k:m[1],v:down},location.origin); return true;}
+addEventListener('keydown',function(e){if(route(e.code,true))e.preventDefault();});
+addEventListener('keyup',function(e){if(route(e.code,false))e.preventDefault();});
+addEventListener('message',function(e){if(e.origin!==location.origin)return; var d=e.data; if(d&&d.code)route(d.code,d.down);});
+</script>
+</body>
+</html>

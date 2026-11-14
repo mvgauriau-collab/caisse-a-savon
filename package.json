@@ -1,0 +1,19 @@
+{
+  "name": "grande-descente",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "La Grande Descente : course de caisses a savon multijoueur, version Vercel",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "test": "node test/multi-instance.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "ioredis-mock": "^8.9.0"
+  }
+}
