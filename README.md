@@ -6,7 +6,9 @@ Course de caisses à savon multijoueur. Cette version se déploie sur Vercel : l
 
 - `public/` : le jeu (page principale, écran partagé, moteur 3D embarqué). Servi tel quel.
 - `api/ws.js` : la fonction Vercel qui tient les connexions WebSocket (`/api/ws`).
+- `api/account.js` : la fonction Vercel des comptes pilotes (`/api/account`).
 - `lib/game.js` : les règles des parties (salons, départ, arrivées, classement).
+- `lib/accounts.js` : comptes, sessions et statistiques.
 - `lib/store.js` : l'état partagé entre instances, dans Redis.
 - `dev-server.js` : pour jouer en local sans Vercel.
 - `test/` : vérifie que deux instances se coordonnent bien.
@@ -32,6 +34,18 @@ Sans `REDIS_URL`, le jeu démarre quand même avec un état en mémoire, mais ce
 ## Coupure des connexions
 
 Vercel ferme une connexion quand la fonction atteint sa durée maximale (300 secondes ici, réglable dans `vercel.json` selon l'offre). Le jeu se reconnecte tout seul et le joueur garde sa place, sa caisse et sa course en cours. Un joueur qui ne revient pas au bout de 20 secondes est retiré de la partie.
+
+## Comptes pilotes
+
+- Facultatifs : on peut jouer sans compte, le niveau reste alors dans le navigateur.
+- Un compte, c'est un pseudo et un code secret. Le code n'est jamais stocké, seulement son empreinte.
+- Le serveur enregistre chaque course terminée : expérience, nombre de courses, victoires, podiums et les 10 dernières courses.
+- Victoire et podium ne comptent qu'à partir de 2 pilotes, et le dernier n'est jamais sur le podium.
+- Pas de récupération automatique d'un code oublié. Les comptes sont dans Redis (clés `gd:acct:*`).
+
+## Circuits
+
+Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, Désert, Hiver. Le tracé est tiré à chaque manche ; l'hiver adhère un peu moins.
 
 ## Parties
 

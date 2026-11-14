@@ -6,7 +6,7 @@
   "description": "La Grande Descente : course de caisses a savon multijoueur, version Vercel",
   "scripts": {
     "dev": "node dev-server.js",
-    "test": "node test/multi-instance.test.js"
+    "test": "node test/multi-instance.test.js && node test/accounts.test.js"
   },
   "engines": { "node": ">=20" },
   "dependencies": {
