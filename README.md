@@ -60,6 +60,7 @@ Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, D�
 - Un nom de salle n'est pas un mot de passe : quiconque le devine peut entrer s'il reste une place.
 - Le bouton Inviter de la grille partage un lien qui pré-remplit le nom de la salle.
 - Depuis la course : menu (ou Échap) pour abandonner et revenir à la grille, ou quitter la salle. Depuis la grille et les résultats : quitter la salle.
+- Le salon `JGA` a son circuit : Bournezeau (Vendée), choisi d'office et proposé seulement dans ce salon (et en LAN). Tracé fixe à l'échelle 1, calé sur la position réelle de la mairie, de l'église Saint-André, du Relais du Cheval Blanc et de la brasserie L'Éco Pain ; les petites courbes de la dernière portion sont inventées pour le jeu. Pour réserver un autre circuit à un salon : table `SPECIAL` dans `lib/game.js`.
 - Classement général des comptes (niveau, victoires, podiums), accessible depuis l'atelier et la grille (`gd:lb:*` dans Redis).
 - 8 pilotes maximum par salle (humains et bots confondus, départ sur deux lignes), autant de salles en parallèle que voulu. L'écran partagé sur un clavier reste limité à 4.
 - L'écran partagé (`/duo?n=2` à `4`) met tous les joueurs du clavier dans la même partie.

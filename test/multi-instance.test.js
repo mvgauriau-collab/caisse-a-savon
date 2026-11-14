@@ -66,6 +66,11 @@ a.say({ t: 'lobby' }); await sleep(120); assert.equal(b2.last('state').phase, 'l
 const extra = []; for (let i = 0; i < 7; i++) { const w = new FakeWS(); (i % 2 ? A : B).onConnection(w, 'TEST'); w.say({ t: 'join', token: 'x' + i, name: 'P' + i }); extra.push(w); await sleep(120); }
 assert.equal(a.last('state').players.length, 8); assert.ok(extra[6].last('full'), 'le 9e joueur est refuse'); assert.deepEqual(a.last('state').players.map((x) => x.slot), [0, 1, 2, 3, 4, 5, 6, 7]);
 step('partie limitee a 8 pilotes');
+// circuit reserve au salon JGA
+{ const j = new FakeWS(); A.onConnection(j, 'JGA'); j.say({ t: 'join', token: 'jga1', name: 'Marie' }); await sleep(150);
+  assert.equal(j.last('state').theme, 'bournezeau', 'le salon JGA propose Bournezeau d\'office'); j.say({ t: 'start' }); await sleep(150); assert.equal(j.last('start').theme, 'bournezeau');
+  a.say({ t: 'theme', v: 'bournezeau' }); await sleep(120); assert.notEqual(a.last('state').theme, 'bournezeau', 'Bournezeau est refuse hors du salon JGA'); j.say({ t: 'leave' }); await sleep(150); }
+step('circuit Bournezeau reserve au salon JGA');
 const bad = new FakeWS(); A.onConnection(bad, 'a b'); assert.ok(bad.last('badroom'));
 for (const w of [a, b2, ...extra]) w.close(); await sleep(300);
 assert.equal(A._rooms.size, 0); assert.equal(B._rooms.size, 0);
