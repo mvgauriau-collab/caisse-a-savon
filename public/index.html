@@ -616,19 +616,18 @@ const THEMES={
   desert:{nom:'Désert',sky:['#e07f34','#f5c485','#fdeacb'],fog:[0xf3dcb4,190,700],hemi:[0xfff0d0,0xb98a4e,1.2],sun:[0xffe2a8,3.0],grass:'#d9b06a',blade:['rgba(150,105,50,.45)','rgba(245,220,160,.5)'],bank:0xc99a55,terr:[.085,.025,.55,.5,.13],road:'rgba(214,170,110,.2)',grip:1,curv:[0,0,.012,.02,.03],slope:[.08,.18],extra:['bosses','tremplin','tonneaux','tonneaux'],clouds:[10,0xfff3dc]},
   hiver:{nom:'Hiver',sky:['#5b84b8','#b9d2ea','#eef5fb'],fog:[0xe4eef6,110,470],hemi:[0xeaf4ff,0xa9b9c9,1.3],sun:[0xf2f6ff,2.0],grass:'#f1f6fa',blade:['rgba(170,195,215,.5)','rgba(255,255,255,.7)'],bank:0xe3ecf3,terr:[.58,.02,.25,.84,.08],road:'rgba(235,245,255,.2)',grip:.86,curv:[0,.017,.026,.034,.04],slope:[.05,.15],extra:['glisse','glisse','chicane'],clouds:[64,0xf2f5f8]}
 };
-// Bournezeau (Vendee), circuit du salon JGA. Trace fixe a l'echelle 1, cale sur la position reelle des reperes :
-// mairie -> eglise Saint-Andre (95 m vers l'est), virage a droite de 72 degres -> Relais du Cheval Blanc (133 m),
-// virage a gauche de 25 degres, puis 940 m vers le sud-est jusqu'a la brasserie L'Eco Pain, rue Archereau.
-// Les petites courbes de la derniere portion sont inventees pour le jeu.
-// [segments de 2 m, courbure, 1 = sans obstacles]. Les ondulations de la fin s'equilibrent autour du cap reel.
-const BZ_PLAN=[[26,0],[24,-.026],[30,0],[18,.012,1],[15,.015,1],[28,0],[30,-.015],[28,0],[30,.015],[28,0],[30,-.015],[28,0],[30,.015],[28,0],[30,-.015],[28,0],[30,.015],[28,0],[30,-.015],[28,0],[15,.015,1]];
+// Bournezeau (Vendee), circuit du salon JGA. Trace releve sur une vue satellite du bourg, du nord au sud :
+// rue principale, place de la Mairie, le S du centre, carrefour de la rue Jean Grolleau, le cimetiere,
+// puis la rue de l'Armistice (D48) jusqu'au rond-point. Longueurs doublees pour que la course dure.
+// [nombre de segments de 2 m, courbure]
+const BZ_PLAN=[[12,-0.0001],[24,-0.0002],[6,-0.0008],[6,-0.0029],[6,-0.0026],[6,-0.0025],[6,-0.0024],[6,-0.0018],[6,-0.002],[6,0.0038],[6,0.005],[6,0.0062],[6,0.0064],[6,0.0075],[6,0.0067],[6,-0.0127],[6,-0.0171],[6,-0.0157],[6,-0.0135],[6,-0.0088],[6,-0.0089],[6,0.0039],[6,0.0075],[6,0.011],[6,0.0164],[6,0.0243],[6,0.0165],[6,0.004],[6,0.0034],[6,0.003],[6,0.0024],[6,0.0017],[6,0.0018],[6,0.0021],[6,0.0002],[6,-0.0087],[6,-0.0076],[6,-0.0044],[6,-0.0036],[6,-0.0024],[6,-0.002],[6,-0.0017],[6,-0.0019],[6,-0.0009],[6,-0.0019],[6,-0.0004],[6,-0.0015],[6,-0.0009],[6,-0.0003],[6,-0.0014],[6,-0.0004],[6,-0.0001],[6,-0.0005],[12,-0.0001],[6,-0.0005],[6,-0.0001],[6,-0.0002],[6,-0.0005],[6,-0.0001],[6,-0.0003],[6,-0.0005],[6,-0.0001],[6,-0.0008],[6,-0.0005],[6,-0.0009],[6,-0.0014],[6,-0.0024],[6,-0.0057],[6,-0.0063],[6,-0.0018],[6,-0.001],[6,-0.0007],[6,0.0003],[6,0.0017],[6,0.0016],[6,0.0013],[6,0.0014],[12,0.0013],[6,0.0017],[6,0.0016],[6,0.0014],[6,0.0016],[6,0.0013],[6,0.0014],[6,0.0005],[6,0.0004],[6,0.0005],[6,0.0004],[12,0.0005],[6,0.0003],[17,0.0]];
 function buildTrack(seed,theme){
   const seed0=seed, BZ=theme==='bournezeau'; if(BZ){seed=85480; theme='campagne';}
   const TT=THEMES[theme]||THEMES.campagne; theme=THEMES[theme]?theme:'campagne';
   const rnd=mulberry(seed); const pick=a=>a[Math.floor(rnd()*a.length)];
   let K=[],S=[],sections=[]; const add=(n,k,s)=>{const st=K.length; for(let i=0;i<n;i++){K.push(k);S.push(s);} return st;};
   add(22,0,0.30); let head=0, prev=0;
-  if(BZ)BZ_PLAN.forEach(q=>{ const s=.07+rnd()*.1, st=add(q[0],q[1],s); if(!q[2])sections.push({start:st,n:q[0],k:q[1]}); });
+  if(BZ){ const a0=K.length; BZ_PLAN.forEach(q=>add(q[0],q[1],.1)); for(let st=a0+2;st+30<=K.length;st+=30){ let m=0; const sl=.07+rnd()*.09; for(let i=st;i<st+30;i++){m+=K[i]; S[i]=sl;} sections.push({start:st,n:30,k:m/30}); } }
   else for(let i=0;i<14;i++){
     if(i>1&&rnd()<0.25)add(5,prev,-0.10);
     const n=28+Math.floor(rnd()*26); let k=pick(TT.curv)*(rnd()<.5?1:-1);
@@ -663,7 +662,7 @@ function buildTrack(seed,theme){
     const used=PAT[kind](b,room), rest=room-used-9;
     if(rest>12){ let k2=pick(FILL); if(k2===kind)k2=pick(FILL); const u2=PAT[k2](b+used+9,rest), r3=rest-u2-9; if(r3>12&&rnd()<.6)PAT[pick(['slalom','vrac','portes'])](b+used+u2+18,r3); }
     else if(kind!=='glisse'&&kind!=='tremplin'&&rnd()<.4)patch(b+room-2,(rnd()-.5)*5,1.9,1.6,rnd()<.5?'savon':'boue');
-    if(Math.abs(sec.k)>=.025){const out=sec.k>0?1:-1; deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS-6,x:out*5.7}); deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS+6,x:out*5.7});}
+    if(Math.abs(sec.k)>=(BZ?.009:.025)){const out=sec.k>0?1:-1; deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS-6,x:out*5.7}); deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS+6,x:out*5.7});}
   });
   return {theme:theme,gates:gates,movers:objs.filter(o=>o.type==='tonneau'),pts:pts,N:N,len:(N-1)*DS,objs:objs,buckets:buckets,patches:patches,deco:deco,finishS:finish*DS,wallS:finish*DS+40,startS:11,seed:seed0,lieu:BZ?'bournezeau':null,nom:BZ?'Bournezeau':TT.nom};
 }
@@ -778,45 +777,55 @@ function buildWorld(){
     const ln=new THREE.Mesh(new THREE.PlaneGeometry(8,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:lt,polygonOffset:true,polygonOffsetFactor:-4})); ln.position.set(F0.x,F0.y+.02,F0.z); ln.rotation.order='YXZ'; ln.rotation.y=F0.th; ln.rotation.x=Math.atan(F0.slope); scene.add(ln);};
   arch(tr.startS,'DÉPART','#27ae60'); arch(tr.finishS,'ARRIVÉE','#e8402f');
   if(tr.lieu==='bournezeau'){
+    // Reperes places d'apres la vue satellite. Cote gauche (xl negatif) = est, cote droit = ouest : on descend vers le sud.
     const L=(c,o)=>new THREE.MeshLambertMaterial(Object.assign({color:c,emissive:c,emissiveIntensity:.22},o||{}));
-    const stone=L(0xe9dfc8), slate=L(0x4a5563,{flatShading:true}), tile=L(0xc8643a,{flatShading:true}), white=L(0xf6f1e6), dark=L(0x2b2f3a), wood=L(0x7a4a2a);
+    const stone=L(0xe9dfc8), slate=L(0x4a5563,{flatShading:true}), tile=L(0xc8643a,{flatShading:true}), white=L(0xf6f1e6), dark=L(0x2b2f3a), wood=L(0x7a4a2a), grey=L(0x9aa0a6);
     const bx=(g,w,h,d,m,x,y,z)=>{const e=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); e.position.set(x||0,y,z||0); e.castShadow=true; e.receiveShadow=true; g.add(e); return e;};
     const roof=(g,w,h,d,m,x,y,z)=>{const e=new THREE.Mesh(new THREE.ConeGeometry(1,1,4).rotateY(Math.PI/4),m); e.scale.set(w/1.414*1.06,h,d/1.414*1.06); e.position.set(x||0,y+h/2,z||0); e.castShadow=true; g.add(e); return e;};
     const panel=(g,txt,w,h,bg,fg,x,y,z,border)=>{const t=canvasTex(512,Math.max(32,Math.round(512*h/w)),(c,W,H)=>{c.fillStyle=bg; c.fillRect(0,0,W,H); if(border){c.strokeStyle=border; c.lineWidth=H*.12; c.strokeRect(H*.06,H*.06,W-H*.12,H-H*.12);} c.fillStyle=fg; c.textAlign='center'; c.textBaseline='middle'; let fs=H*.56; c.font='900 '+fs+'px system-ui,sans-serif'; while(c.measureText(txt).width>W*.86&&fs>8){fs-=2; c.font='900 '+fs+'px system-ui,sans-serif';} c.fillText(txt,W/2,H/2+2);});
       const e=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})); e.position.set(x||0,y,z||0); g.add(e); return e;};
-    // batiment pose au bord de la route, facade tournee vers la piste
     const place=(s,xl)=>{ fr(s,F0); const sg=xl>0?1:-1, x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl, g=new THREE.Group(); g.position.set(x,Math.max(terrainH(x,z),F0.y-1.6)-.3,z); g.rotation.y=Math.atan2(-sg*F0.rx,-sg*F0.rz); scene.add(g); return g; };
-    // panneau sur poteaux, face aux pilotes
     const post=(s,xl,txt,w,h,bg,fg,border,barre)=>{ fr(s,F0); const g=new THREE.Group(); g.position.set(F0.x+F0.rx*xl,F0.y,F0.z+F0.rz*xl); g.rotation.y=F0.th+Math.PI; scene.add(g);
-      for(const d of[-w*.4,w*.4])bx(g,.12,3.4,.12,L(0x9aa0a6),d,1.7,0); const e=panel(g,txt,w,h,bg,fg,0,3.1,.08,border); if(barre){const b=bx(g,w*1.05,.16,.02,L(0xd9261c),0,3.1,.12); b.rotation.z=.32; b.castShadow=false;} return e; };
+      for(const d of[-w*.4,w*.4])bx(g,.12,3.4,.12,grey,d,1.7,0); const e=panel(g,txt,w,h,bg,fg,0,3.1,.08,border); if(barre){const b=bx(g,w*1.05,.16,.02,L(0xd9261c),0,3.1,.12); b.rotation.z=.32; b.castShadow=false;} return e; };
     const wins=(g,n,w,y,z,x0)=>{ for(let i=0;i<n;i++)bx(g,1.1,1.7,.12,dark,(x0||0)-w/2+w*(i+.5)/n,y,z).castShadow=false; };
-    { // mairie, place de la Mairie
-      const g=place(15,-16); bx(g,15,9,8,white,0,4.5,-5); roof(g,15,3.2,8,slate,0,9,-5); wins(g,5,13,6.6,-.95); wins(g,2,5,3.2,-.95,-4); wins(g,2,5,3.2,-.95,4); bx(g,1.8,3,.14,wood,0,2.3,-.95); bx(g,4,.5,2,stone,0,.9,-.2);
+    const shop=(s,xl,txt,bg)=>{ const g=place(s,xl); bx(g,11,6,7,white,0,3,-4.5); roof(g,11,2.6,7,tile,0,6,-4.5); bx(g,6,2.6,.14,dark,-1,2,-.95).castShadow=false; bx(g,8,.22,1.6,L(bg),-1,3.6,-.1); panel(g,txt,7,.9,'#'+bg.toString(16).padStart(6,'0'),'#fff',-1,4.5,-.9); wins(g,3,9,5,-.95,0); };
+    const S_MAIRIE=333, S_JG=541, S_CIM0=548, S_CIM1=686, S_D48=700, S_FIN=tr.finishS;
+    { // mairie, sur la place, cote est
+      const g=place(S_MAIRIE,-17); bx(g,15,9,8,white,0,4.5,-5); roof(g,15,3.2,8,slate,0,9,-5); wins(g,5,13,6.6,-.95); wins(g,2,5,3.2,-.95,-4); wins(g,2,5,3.2,-.95,4); bx(g,1.8,3,.14,wood,0,2.3,-.95); bx(g,4,.5,2,stone,0,.9,-.2);
       panel(g,'MAIRIE',4.6,1,'#f6f1e6','#1d2b53',0,4.75,-.9); bx(g,.1,6,.1,L(0xdadde3),6.2,10,-1.4);
       const fl=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.5),new THREE.MeshBasicMaterial({side:THREE.DoubleSide,map:canvasTex(96,60,(c,W,H)=>{c.fillStyle='#1f3fa8'; c.fillRect(0,0,W/3,H); c.fillStyle='#fff'; c.fillRect(W/3,0,W/3,H); c.fillStyle='#e0322d'; c.fillRect(W*2/3,0,W/3,H);})})); fl.position.set(7.45,12.2,-1.4); g.add(fl); }
-    { // eglise Saint-Andre : nef, clocher et fleche d'ardoise
-      const g=place(112,-21); bx(g,24,11,11,stone,2,5.5,-7); const r=roof(g,24,6,11,slate,2,11,-7); bx(g,6.4,22,6.4,stone,-13,11,-7); roof(g,6.4,15,6.4,slate,-13,22,-7);
+    { // eglise Saint-Andre, en retrait a l'est de la mairie : on voit surtout la fleche
+      const g=place(S_MAIRIE-46,-40); bx(g,24,11,11,stone,2,5.5,-7); roof(g,24,6,11,slate,2,11,-7); bx(g,6.4,22,6.4,stone,-13,11,-7); roof(g,6.4,15,6.4,slate,-13,22,-7);
       bx(g,.18,2.2,.18,L(0xd9b44a),-13,38,-7); bx(g,1.2,.18,.18,L(0xd9b44a),-13,38.4,-7);
       for(let i=0;i<5;i++){ bx(g,1.3,5.2,.14,L(0x3b4f7a),-6.5+i*4.3,6.2,-1.45).castShadow=false; bx(g,1,8,1.2,stone,-8.6+i*4.3,4,-1.2); }
       bx(g,2.2,4,.14,wood,-13,2.6,-3.75); const ro=new THREE.Mesh(new THREE.CircleGeometry(1.5,20),new THREE.MeshBasicMaterial({color:0x6f8fd0})); ro.position.set(-13,10,-3.76); g.add(ro);
       const cl=new THREE.Mesh(new THREE.CircleGeometry(1.1,20),new THREE.MeshBasicMaterial({color:0xf6f1e6})); cl.position.set(-13,17.5,-3.76); g.add(cl); bx(g,.12,.9,.05,dark,-13,17.9,-3.7); bx(g,.7,.12,.05,dark,-12.7,17.5,-3.7); }
-    { // le Relais du Cheval Blanc, rue Jean Grolleau
-      const g=place(216,15); bx(g,14,7.5,8,white,0,3.75,-5); roof(g,14,3,8,tile,0,7.5,-5); wins(g,4,12,5.6,-.95); wins(g,2,5,2.9,-.95,-4); bx(g,1.6,2.8,.14,wood,3,2.1,-.95); bx(g,7,.25,2,L(0x9c2b2b),-2.5,4,.05);
-      panel(g,'LE RELAIS DU CHEVAL BLANC',9,1,'#7c1f1f','#fff',0,7.1,-.9); for(const d of[-5,-2.5,0])bx(g,1.1,.9,1.1,wood,d,1,1.4); }
-    { // brasserie L'Eco Pain, rue Archereau : l'arrivee, avec la chope geante
-      const g=place(tr.finishS-26,-19); bx(g,20,7,12,L(0xcfd8dd),0,3.5,-7); bx(g,20.6,.6,12.6,L(0x2f3b46),0,7.3,-7); bx(g,4,4.4,.14,L(0x2f3b46),-5,2.5,-.95); wins(g,3,8,4.4,-.95,4);
-      panel(g,"L'ÉCO PAIN · MICRO-BRASSERIE",13,1.5,'#1f2d24','#ffd23f',0,6,-.9);
-      const mug=new THREE.Group(); mug.position.set(8,7.6,-4); g.add(mug); const am=new THREE.Mesh(new THREE.CylinderGeometry(2,1.8,4.6,20),L(0xf2a81d)); am.position.y=2.3; am.castShadow=true; mug.add(am);
+    // commerces du bourg, aux emplacements de la vue satellite (enseignes generiques)
+    shop(52,-15,'BOUCHERIE',0x9c2b2b); shop(404,17,'SUPÉRETTE',0x2f7d4f); shop(372,-16,'LIBRAIRIE',0x2b4a9c); shop(468,16,'COIFFURE',0x7a3f9c);
+    { // cimetiere, a l'ouest de la route : mur de pierre et croix
+      const r3=mulberry(85), cr=[], wl=[];
+      for(let s=S_CIM0;s<=S_CIM1;s+=4){ fr(s,F0); const x=F0.x+F0.rx*9.5, z=F0.z+F0.rz*9.5; push(wl,x,Math.max(terrainH(x,z),F0.y-1.2)+.6,z,4.1,1.6,.5,C.set(0xd8d2c4),F0.th); }
+      for(let s=S_CIM0+4;s<S_CIM1-2;s+=5)for(let xl=13;xl<50;xl+=4.5){ if(r3()<.25)continue; fr(s+r3()*2,F0); const x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl, h=Math.max(terrainH(x,z),F0.y-1.2); C.setHSL(0,0,.55+r3()*.3); push(cr,x,h+.7,z,.22,1.5,.22,C,F0.th); push(cr,x,h+1.05,z,.85,.22,.22,C,F0.th); push(cr,x,h+.12,z,1,.3,1.9,C,F0.th); }
+      inst(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial(),wl,true); inst(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial(),cr,false); }
+    { // vallon boise de la Doulaye, a l'est de la rue de l'Armistice
+      const r4=mulberry(48), tk=[], lf=[];
+      for(let i=0;i<150;i++){ const s=S_JG+60+r4()*(S_FIN-S_JG-150), xl=-(16+r4()*70); fr(s,F0); const x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl; if(nearTrack(x,z)[0]<13)continue; const h=terrainH(x,z), sc=1.1+r4()*1.3;
+        C.set(0x6b4a2b); push(tk,x,h+1.1*sc,z,sc,sc,sc,C,0); C.setHSL(.30+r4()*.06,.5,.2+r4()*.12); push(lf,x,h+(2.2+1.3)*sc,z,sc*1.25,sc*1.5,sc*1.25,C,r4()*6); }
+      inst(new THREE.CylinderGeometry(.18,.26,2.2,6),new THREE.MeshLambertMaterial(),tk,true); inst(new THREE.IcosahedronGeometry(1.9,0),new THREE.MeshLambertMaterial({flatShading:true}),lf,true); }
+    { // arrivee au rond-point : la buvette du JGA et sa chope geante
+      const g=place(S_FIN-26,-19); bx(g,18,6,10,white,0,3,-6); bx(g,18.6,.5,10.6,L(0x9c2b2b),0,6.2,-6); bx(g,10,1.2,1.2,wood,0,1.4,0); for(const d of[-6,-3,0,3,6])bx(g,.5,1,.5,dark,d,.9,2.4);
+      panel(g,'BUVETTE DU JGA',12,1.5,'#1f2d24','#ffd23f',0,5,-.9);
+      const mug=new THREE.Group(); mug.position.set(7,6.5,-4); g.add(mug); const am=new THREE.Mesh(new THREE.CylinderGeometry(2,1.8,4.6,20),L(0xf2a81d)); am.position.y=2.3; am.castShadow=true; mug.add(am);
       for(const q of[[0,0,2.1],[1.1,.5,1.5],[-1,-.6,1.5],[.2,-1.1,1.4],[-.3,1,1.4]]){const f=new THREE.Mesh(new THREE.IcosahedronGeometry(q[2]*.62,1),L(0xfffaf0)); f.position.set(q[0],4.9+q[2]*.1,q[1]); mug.add(f);}
       const an=new THREE.Mesh(new THREE.TorusGeometry(1.25,.28,8,18,Math.PI),L(0xf6f1e6)); an.rotation.z=-Math.PI/2; an.position.set(2,2.4,0); mug.add(an); }
-    // panneaux : entree et sortie d'agglomeration, plaques de rue, banderole
-    post(26,5.9,'BOURNEZEAU',3.6,1.1,'#fff','#111','#d9261c'); post(tr.finishS-46,5.9,'BOURNEZEAU',3.6,1.1,'#fff','#111','#111',true);
-    [[40,'Place de la Mairie'],[92,"Rue de l'Église"],[196,'Rue Jean Grolleau'],[460,'Rue Archereau'],[900,'Rue Archereau']].forEach(q=>post(q[0],-5.9,q[1],3.2,.8,'#1f3fa8','#fff','#fff'));
-    arch(70,'VIVE LE JGA','#9b5de5');
-    // maisons du bourg le long de la rue : murs clairs, toits de tuiles
-    { const r2=mulberry(8548), hw2=[], hr2=[], pris=[[15,-1],[112,-1],[216,1],[tr.finishS-26,-1]];
-      for(let s=34;s<tr.finishS-60;s+=s<470?12.5:27)for(const sd of[-1,1]){ if(s>470&&r2()<.45)continue; if(pris.some(q=>q[1]===sd&&Math.abs(q[0]-s)<(q[0]===112?30:20)))continue;
-        const xl=sd*(14.5+r2()*4); fr(s,F0); const x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl, h=Math.max(terrainH(x,z),F0.y-1.4), sc=.9+r2()*.35;
+    // panneaux : agglomeration, plaques de rue, departementale, banderole
+    post(26,5.9,'BOURNEZEAU',3.6,1.1,'#fff','#111','#d9261c'); post(S_FIN-46,5.9,'BOURNEZEAU',3.6,1.1,'#fff','#111','#111',true);
+    [[296,-5.9,'Place de la Mairie'],[S_JG-10,-5.9,'Rue Jean Grolleau'],[S_JG-10,5.9,'← Le Cheval Blanc'],[S_CIM0+30,5.9,'Cimetière'],[S_D48+40,-5.9,"Rue de l'Armistice"],[860,-5.9,'La Doulaye'],[1010,5.9,"Rue de l'Armistice"]].forEach(q=>post(q[0],q[1],q[2],3.2,.8,'#1f3fa8','#fff','#fff'));
+    post(S_D48,5.9,'D 48',1.6,.8,'#ffcf1a','#111','#111'); arch(120,'VIVE LE JGA','#9b5de5');
+    // maisons : bourg dense jusqu'au carrefour, lotissement a l'ouest ensuite, champs en bas
+    { const r2=mulberry(8548), hw2=[], hr2=[], pris=[[52,-1],[S_MAIRIE,-1],[372,-1],[404,1],[468,1],[S_FIN-26,-1]];
+      for(let s=30;s<1090;s+=s<S_JG+10?12.5:19)for(const sd of[-1,1]){ if(s>S_CIM0-12&&s<S_CIM1+8&&sd>0)continue; if(s>S_JG+70&&sd<0)continue; if(s>S_JG+10&&r2()<.3)continue; if(pris.some(q=>q[1]===sd&&Math.abs(q[0]-s)<18))continue;
+        const xl=sd*(14.5+r2()*4+(s>S_CIM1?r2()*10:0)); fr(s,F0); const x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl, h=Math.max(terrainH(x,z),F0.y-1.4), sc=.9+r2()*.35;
         C.setHSL(.09+r2()*.04,.3,.84+r2()*.08); push(hw2,x,h+1.6*sc,z,1,sc,1.1,C,F0.th+(r2()-.5)*.12); C.setHSL(.035+r2()*.025,.62,.45+r2()*.08); push(hr2,x,h+(4.2+1.3)*sc,z,1,sc,1.1,C,F0.th); }
       inst(new THREE.BoxGeometry(6,5.2,5),new THREE.MeshLambertMaterial(),hw2,true); inst(new THREE.ConeGeometry(5.2,2.8,4).rotateY(Math.PI/4),new THREE.MeshLambertMaterial({flatShading:true}),hr2,true); }
   }
