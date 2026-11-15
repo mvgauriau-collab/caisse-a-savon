@@ -1,8 +1,9 @@
-// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg' | 'pays' | 'top', ... }
+// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg' | 'pays' | 'top' | 'rooms', ... }
 import { createAccounts } from '../lib/accounts.js';
 import { makeStore } from '../lib/store.js';
+import { listRooms } from '../lib/game.js';
 
-const accounts = createAccounts(await makeStore());
+const store = await makeStore(), accounts = createAccounts(store);
 
 export async function handleAccount(body) {
   const b = body && typeof body === 'object' ? body : {};
@@ -10,6 +11,7 @@ export async function handleAccount(body) {
     case 'signup': return accounts.signup(b.pseudo, b.code, b.pays);
     case 'pays': return accounts.setPays(b.session, b.pays);
     case 'top': return accounts.top(b.by, b.session);
+    case 'rooms': return listRooms(store);
     case 'login': return accounts.login(b.pseudo, b.code);
     case 'me': return accounts.me(b.session);
     case 'logout': return accounts.logout(b.session);

@@ -184,7 +184,16 @@ button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,
 .regl{width:100%;max-width:1120px;display:flex;gap:10px 28px;flex-wrap:wrap;justify-content:center;padding:10px 14px;margin-bottom:12px}
 .rl{display:flex;align-items:center;gap:10px;min-width:0}
 .rl em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
-#themes,#botsel{margin:0}
+#themes,#botsel,#pubsel{margin:0}
+#salles{width:100%;max-width:1120px;display:flex;align-items:center;gap:10px;margin:0 0 12px;min-width:0}
+#salles em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);flex-shrink:0}
+#slist{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;min-width:0;flex:1;scrollbar-width:thin}
+.salle{flex-shrink:0;display:flex;align-items:center;gap:9px;font:inherit;color:var(--txt);background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;text-align:left}
+.salle b{font-size:15px;display:block;line-height:1.15}.salle small{color:var(--mut);font-weight:700;font-size:12px;white-space:nowrap}
+.salle i{font-style:normal;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(61,220,132,.16);color:#6ee7a8;white-space:nowrap}.salle i.c{background:rgba(255,140,26,.18);color:#ffb866}
+.salle u{text-decoration:none;font-weight:800;font-size:13px;background:var(--acc);color:#1a1300;border-radius:10px;padding:8px 12px}.salle:disabled{opacity:.5}.salle:disabled u{background:var(--line);color:var(--mut)}
+#slist p{margin:0;color:var(--mut);font-size:13px;font-weight:700;padding:8px 0}
+@media(max-width:640px){#salles{flex-direction:column;align-items:stretch;gap:4px}}
 .seg{flex-wrap:wrap;justify-content:center}
 .grille{margin-bottom:16px}
 #top .seg{margin-bottom:8px}
@@ -229,12 +238,13 @@ button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,
 <div id="garage" class="screen">
   <header class="topbar"><div class="brand"><h1>La Grande <span>Descente</span></h1><p>Caisses à savon · jusqu'à 8 pilotes</p></div><div class="tools"><button class="btn" id="btop" title="Classement général">🏆<span> Classement</span></button><button class="btn" id="bacct">👤 Compte</button></div></header>
   <div id="duo"><div class="seg"><span class="on">Solo</span><a href="/duo?n=2">2 joueurs</a><a href="/duo?n=3">3 joueurs</a><a href="/duo?n=4">4 joueurs</a></div><p class="cap">À plusieurs : même clavier, écran partagé</p></div>
+  <div id="salles" class="hidden"><em>Salles ouvertes</em><div id="slist"></div></div>
   <div class="cols">
     <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div class="niv" id="niv"></div></div>
     <div class="card"><h2>Atelier</h2><div id="opts"></div><button class="btn" id="rand" style="margin-top:12px">🎲 Au hasard</button></div>
   </div>
   <div class="dock">
-    <p class="info" id="ghint">Tape un nom de salle : elle est créée si elle n'existe pas, sinon tu la rejoins. Vide : salle privée.</p>
+    <p class="info" id="ghint">Tape un nom de salle : elle est créée (publique, visible ici) ou tu la rejoins. Vide : salle privée.</p>
     <div class="in">
       <input id="nom" type="text" maxlength="14" placeholder="Ton nom de pilote" autocomplete="off" enterkeyhint="go">
       <input id="room" type="text" maxlength="16" placeholder="Nom de la salle" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="characters" enterkeyhint="go" style="text-transform:uppercase">
@@ -249,7 +259,7 @@ button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,
 <div id="lobby" class="screen hidden">
   <header class="topbar"><div class="brand"><h1 id="ltitle">Grille de <span>départ</span></h1><p id="lsub"></p></div><div class="tools"><button class="btn" id="btop2" title="Classement général">🏆<span> Classement</span></button><button class="btn" id="bleave">Quitter</button></div></header>
   <button class="adresse" id="adresse" title="Inviter"></button>
-  <div class="card regl"><div class="rl"><em>Circuit</em><div class="seg" id="themes"></div></div><div class="rl"><em>Bots</em><div class="seg" id="botsel"></div></div></div>
+  <div class="card regl"><div class="rl"><em>Circuit</em><div class="seg" id="themes"></div></div><div class="rl"><em>Bots</em><div class="seg" id="botsel"></div></div><div class="rl" id="rlpub"><em>Accès</em><div class="seg" id="pubsel"></div></div></div>
   <div class="grille" id="grille"></div>
   <div class="dock">
     <p class="info" id="lmsg"></p>
@@ -491,17 +501,28 @@ function setAccount(a,s,fresh){ account=a; if(s!==undefined){ session=s; try{ if
   renderAcct(); showLevel(); syncPlay(); }
 async function refreshAccount(){ if(!account||!session)return; const r=await api({action:'me',session:session}); if(r.ok){ account=r.account; renderAcct(); showLevel(); } }
 
+// --- salles publiques affichees a l'accueil
+let wantPub=false, lobbyPub=false; const CIRC={campagne:'Campagne',desert:'Désert',hiver:'Hiver',bournezeau:'Bournezeau'};
+async function loadSalles(){ if(LAN||EMBED)return; const box=$('salles'); if(myId||$('garage').classList.contains('hidden'))return;
+  const r=await api({action:'rooms'}); if(!r||!r.ok||myId)return; box.classList.remove('hidden'); const L=$('slist'); L.innerHTML='';
+  if(!r.rooms.length){ L.innerHTML='<p>Aucune salle publique pour l\'instant. Crée la tienne en tapant un nom.</p>'; return; }
+  r.rooms.forEach(q=>{ const b=document.createElement('button'), plein=q.n>=q.max; b.className='salle'; b.disabled=plein;
+    b.innerHTML='<span><b></b><small></small></span><i class="'+(q.racing?'c':'')+'">'+(q.racing?'En course':'En attente')+'</i><u>'+(plein?'Complet':'Rejoindre')+'</u>';
+    b.querySelector('b').textContent=q.room; b.querySelector('small').textContent=q.n+'/'+q.max+' pilotes'+(CIRC[q.theme]?' · '+CIRC[q.theme]:'');
+    b.title=q.racing?'Course en cours : tu attendras la prochaine manche sur la grille':'Rejoindre la salle '+q.room;
+    b.onclick=()=>{ $('room').value=q.room; $('go').click(); }; L.appendChild(b); }); }
+setInterval(()=>{ if(document.visibilityState==='visible')loadSalles(); },8000); setTimeout(loadSalles,400);
 // --- retours : quitter la partie, abandonner la course
 let quitSeed=0;
 function leaveRoom(){ send({t:'leave'}); wantConn=false; const k=ws; ws=null; setTimeout(()=>{try{if(k)k.close();}catch(_){}} ,200); myId=null; racing=false; players=[]; reconn=0;
-  $('results').classList.add('hidden'); $('pause').classList.add('hidden'); show('garage'); syncPlay(); $('gmsg').textContent=''; previewDirty=true; if(pv)pv.resize=true; roomCode=''; $('room').value=''; }
+  $('results').classList.add('hidden'); $('pause').classList.add('hidden'); show('garage'); syncPlay(); $('gmsg').textContent=''; previewDirty=true; if(pv)pv.resize=true; roomCode=''; $('room').value=''; setTimeout(loadSalles,500); }
 function quitRace(){ if(track)quitSeed=track.seed; send({t:'quit'}); racing=false; $('pause').classList.add('hidden'); $('results').classList.add('hidden'); show('lobby'); renderLobby(); }
 function lost(msg){ wantConn=false; myId=null; racing=false; reconn=0; const k=ws; ws=null; if(k){try{k.close();}catch(_){}} show('garage'); syncPlay(); $('gmsg').textContent=msg; }
 // La connexion peut etre coupee par l'hebergeur (duree maximale d'une fonction) : on se
 // reconnecte tout seul avec le meme jeton, le serveur nous rend la meme place.
 function connect(){
   const sock=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/api/ws?room='+encodeURIComponent(roomCode)); ws=sock;
-  sock.onopen=()=>{ if(ws===sock)send(Object.assign({t:'join',token:TOKEN},profile())); };
+  sock.onopen=()=>{ if(ws===sock)send(Object.assign({t:'join',token:TOKEN,pub:wantPub},profile())); };
   sock.onmessage=e=>{ if(ws!==sock)return; let m; try{m=JSON.parse(e.data);}catch(_){return;} onMsg(m); };
   sock.onclose=()=>{ if(ws!==sock)return; ws=null; if(!wantConn)return;
     if(myId&&reconn<8){ reconn++; if(reconn>1){ if(racing)toast('Reconnexion...'); else $('lmsg').textContent='Reconnexion...'; } setTimeout(()=>{if(wantConn&&!ws)connect();},Math.min(6000,400*Math.pow(2,reconn-1))+Math.random()*250); }
@@ -511,7 +532,7 @@ $('go').onclick=()=>{
   audioInit(); editing=false;
   if(ws&&ws.readyState===1&&myId){send(Object.assign({t:'car'},profile())); show('lobby'); return;}
   if(ws)return;
-  if(LAN)roomCode='LAN'; else { const typed=$('room').value.trim(); roomCode=cleanCode(typed); if(typed&&roomCode.length<2){ $('gmsg').textContent='Nom de salle : 2 à 16 lettres ou chiffres.'; return; } if(!typed)roomCode=newCode(); $('room').value=roomCode; }
+  if(LAN)roomCode='LAN'; else { const typed=$('room').value.trim(); wantPub=!!typed; roomCode=cleanCode(typed); if(typed&&roomCode.length<2){ $('gmsg').textContent='Nom de salle : 2 à 16 lettres ou chiffres.'; return; } if(!typed)roomCode=newCode(); $('room').value=roomCode; }
   $('gmsg').textContent='Connexion...'; wantConn=true; reconn=0; connect();
 };
 function onMsg(m){
@@ -521,7 +542,7 @@ function onMsg(m){
   else if(m.t==='full')lost(LAN?'Grille complète (8 pilotes).':'Salle complète (8 pilotes). Choisis un autre nom.');
   else if(m.t==='badroom')lost('Nom de salle invalide.');
   else if(m.t==='state'){
-    players=m.players; hostId=m.host; phase=m.phase; serverAddr=m.addr||''; lobbyTheme=m.theme||'alea'; lobbyBots=m.bots||0; if(m.raceBots)raceBots=m.raceBots;
+    players=m.players; hostId=m.host; phase=m.phase; serverAddr=m.addr||''; lobbyTheme=m.theme||'alea'; lobbyBots=m.bots||0; lobbyPub=!!m.pub; if(m.raceBots)raceBots=m.raceBots;
     players.forEach(p=>{p.cfg=normCfg(p.cfg);});
     if(phase==='lobby'){racing=false; $('results').classList.add('hidden'); if(!editing)show('lobby');}
     else if(phase==='results'){ if(racing)showResults(m.results); else show('lobby'); }
@@ -540,6 +561,7 @@ function onMsg(m){
 const nameOf=id=>{const p=players.find(p=>p.id===id); return p?p.name:'';};
 function renderLobby(){
   const g=$('grille'); g.innerHTML='';
+  { const pb=$('pubsel'); $('rlpub').classList.toggle('hidden',LAN); pb.innerHTML=''; [[true,'Publique'],[false,'Privée']].forEach(q=>{ const el=document.createElement(myId===hostId?'a':'span'); el.textContent=q[1]; if(q[0]===lobbyPub)el.className='on'; if(myId===hostId){el.href='#'; el.onclick=e=>{e.preventDefault(); send({t:'pub',v:q[0]});};} pb.appendChild(el); }); }
   const nBots=Math.min(lobbyBots,MAXP-players.length), nLibres=MAXP-players.length-nBots, cases=players.slice().sort((a,b)=>a.slot-b.slot).concat(Array(nBots).fill('bot'));
   if(nLibres>0)cases.push('libre'); while(cases.length<4)cases.push('vide');
   cases.forEach(p=>{ const b=document.createElement('div'), s=p.slot;

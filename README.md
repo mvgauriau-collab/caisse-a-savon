@@ -57,6 +57,7 @@ Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, D�
 ## Parties
 
 - Chaque partie est une salle avec un nom libre (2 à 16 lettres, chiffres ou tirets). On tape un nom : la salle est créée si elle n'existe pas, sinon on la rejoint. Champ vide : salle privée au nom tiré au hasard. Le nom n'est gardé nulle part côté navigateur.
+- Salles publiques ou privées : une salle créée avec un nom est publique, une salle créée champ vide est privée, et l'hôte peut changer ça sur la grille (réglage Accès). Les salles publiques s'affichent à l'accueil avec le nombre de pilotes et leur état (en attente ou en course) et se rejoignent d'un clic ; pendant une course, on attend la manche suivante sur la grille. Index `gd:rooms` dans Redis, action `rooms` de `/api/account`.
 - Un nom de salle n'est pas un mot de passe : quiconque le devine peut entrer s'il reste une place.
 - Le bouton Inviter de la grille partage un lien qui pré-remplit le nom de la salle.
 - Depuis la course : menu (ou Échap) pour abandonner et revenir à la grille, ou quitter la salle. Depuis la grille et les résultats : quitter la salle.

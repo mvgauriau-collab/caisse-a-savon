@@ -71,6 +71,14 @@ step('partie limitee a 8 pilotes');
   assert.equal(j.last('state').theme, 'bournezeau', 'le salon JGA propose Bournezeau d\'office'); j.say({ t: 'start' }); await sleep(150); assert.equal(j.last('start').theme, 'bournezeau');
   a.say({ t: 'theme', v: 'bournezeau' }); await sleep(120); assert.notEqual(a.last('state').theme, 'bournezeau', 'Bournezeau est refuse hors du salon JGA'); j.say({ t: 'leave' }); await sleep(150); }
 step('circuit Bournezeau reserve au salon JGA');
+// salles publiques listees a l'accueil
+{ const { listRooms } = await import('../lib/game.js'); const store = new RedisStore(new RedisMock());
+  const pu = new FakeWS(), pr = new FakeWS(); A.onConnection(pu, 'OUVERTE'); pu.say({ t: 'join', token: 'pu1', name: 'Zoe', pub: true }); B.onConnection(pr, 'SECRETE'); pr.say({ t: 'join', token: 'pr1', name: 'Tom' }); await sleep(200);
+  let l = (await listRooms(store)).rooms; assert.ok(l.some((r) => r.room === 'OUVERTE' && r.n === 1 && !r.racing && r.host === 'Zoe')); assert.ok(!l.some((r) => r.room === 'SECRETE'), 'une salle privee reste invisible');
+  pu.say({ t: 'start' }); pr.say({ t: 'pub', v: true }); await sleep(200); l = (await listRooms(store)).rooms;
+  assert.ok(l.find((r) => r.room === 'OUVERTE').racing, 'la liste indique une course en cours'); assert.ok(l.some((r) => r.room === 'SECRETE'), 'l\'hote peut rendre sa salle publique');
+  pr.say({ t: 'pub', v: false }); pu.say({ t: 'leave' }); await sleep(250); l = (await listRooms(store)).rooms; assert.ok(!l.some((r) => r.room === 'SECRETE' || r.room === 'OUVERTE'), 'salle fermee ou repassee privee : retiree de la liste'); pr.say({ t: 'leave' }); await sleep(100); }
+step('liste des salles publiques');
 const bad = new FakeWS(); A.onConnection(bad, 'a b'); assert.ok(bad.last('badroom'));
 for (const w of [a, b2, ...extra]) w.close(); await sleep(300);
 assert.equal(A._rooms.size, 0); assert.equal(B._rooms.size, 0);
