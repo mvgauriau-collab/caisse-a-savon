@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0b1020">
+<meta name="theme-color" content="#070a1c">
 <title>La Grande Descente</title>
 <style>
 :root{--bg:#0b1020;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--txt:#f4f6fb;--mut:#9aa3b8;--acc:#ffd23f;--hot:#ff5a4d;--ok:#3ddc84;
@@ -230,6 +230,107 @@ button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,
   .tactile .etat{top:auto;bottom:max(18px,env(safe-area-inset-bottom));left:calc(max(18px,env(safe-area-inset-left)) + 96px);width:150px}
   #results h2{font-size:24px;margin-bottom:8px}.ligne{padding:5px 14px 5px 8px;margin:3px 0}.ligne img{width:60px;height:40px}
 }
+
+/* ---------- habillage "tech" : violet, bleu, orange ; panneaux anguleux, lignes fines, chiffres en police technique */
+:root{--bg:#070a1c;--card:rgba(18,22,52,.72);--line:rgba(120,140,255,.24);--txt:#eef1ff;--mut:#8f9ac4;--acc:#ff8a1f;--vio:#8b5cf6;--blu:#38bdf8;--hot:#ff5a4d;--ok:#3ddc84;
+  --glass:rgba(9,12,32,.72);--font:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --cut:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+body{background:
+  linear-gradient(rgba(120,140,255,.055) 1px,transparent 1px) 0 0/100% 36px,
+  linear-gradient(90deg,rgba(120,140,255,.055) 1px,transparent 1px) 0 0/36px 100%,
+  radial-gradient(1100px 650px at 10% -10%,rgba(139,92,246,.42) 0%,transparent 60%),
+  radial-gradient(900px 600px at 100% 0%,rgba(56,189,248,.26) 0%,transparent 55%),
+  radial-gradient(800px 500px at 60% 110%,rgba(255,138,31,.12) 0%,transparent 60%),var(--bg);background-attachment:fixed}
+.brand h1{text-transform:uppercase;letter-spacing:.04em;font-weight:900;font-size:clamp(22px,4.4vw,36px)}
+.brand h1 span{background:linear-gradient(90deg,var(--acc),#ffb65c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand p{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--blu)}
+.card{border-radius:6px;border:1px solid var(--line);background:var(--card);position:relative;box-shadow:0 0 0 1px rgba(0,0,0,.3),0 18px 50px rgba(0,0,0,.35)}
+.card::before{content:"";position:absolute;left:-1px;top:-1px;width:42%;height:2px;background:linear-gradient(90deg,var(--vio),var(--blu),transparent);pointer-events:none}
+.card::after{content:"";position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;border-right:2px solid var(--acc);border-bottom:2px solid var(--acc);pointer-events:none}
+.card h2,.rl em,#salles em,.opt label,.optc label,.jauge,.trow.h{font-family:var(--mono);letter-spacing:.1em}
+.card h2{color:var(--txt);font-size:12px}.card h2::before{content:"// ";color:var(--blu)}
+#preview{border-radius:4px;border:1px solid var(--line);background:
+  linear-gradient(rgba(120,140,255,.09) 1px,transparent 1px) 0 0/100% 28px,linear-gradient(90deg,rgba(120,140,255,.09) 1px,transparent 1px) 0 0/28px 100%,
+  radial-gradient(120% 90% at 50% 20%,#2b2f7a 0%,#11143a 55%,#080a20 100%)}
+.box img,.ligne img{background:radial-gradient(120% 100% at 50% 20%,#2b2f7a 0%,#11143a 60%,#080a20 100%);border-radius:4px;border:1px solid var(--line)}
+.btn{border-radius:4px;border:1px solid var(--line);background:rgba(120,140,255,.08);font-weight:700}
+.btn.on{background:var(--blu);color:#04121c}
+.opt b{font-family:var(--mono);font-size:15px;letter-spacing:.02em;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:4px;padding:8px 4px}
+.opt .btn{color:var(--blu)}
+.pastille{border-radius:4px;border:1px solid rgba(255,255,255,.28)}.pastille.on{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc),0 0 14px rgba(255,138,31,.55)}
+input[type=text],.acct input[type=text],.acct input[type=password],.acct select{border-radius:4px;border:1px solid var(--line);background:rgba(4,6,22,.7);font-family:var(--mono);letter-spacing:.02em}
+.dock input[type=text]{background:rgba(4,6,22,.85)}
+input[type=text]:focus,.acct input:focus,.acct select:focus{border-color:var(--blu);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+input::placeholder{color:#66709c;text-transform:none;letter-spacing:0}
+.cta{border-radius:0;clip-path:var(--cut);background:linear-gradient(100deg,var(--acc),#ff6a00);color:#1a0b00;text-transform:uppercase;letter-spacing:.07em;font-weight:900;font-size:16px;box-shadow:none}
+.cta.ghost{clip-path:none;border-radius:4px;background:rgba(120,140,255,.08);border:1px solid var(--line);color:var(--txt);text-transform:uppercase;font-size:14px}
+.seg{border-radius:6px;background:rgba(4,6,22,.55);border:1px solid var(--line);padding:3px;gap:3px}
+.seg span,.seg a{border-radius:3px;font-size:14px;font-weight:700}
+.seg .on{background:linear-gradient(100deg,var(--vio),#4f7df7);color:#fff;box-shadow:0 0 16px rgba(139,92,246,.45)}
+.seg a:hover{background:rgba(120,140,255,.14)}
+.cap,.info,.astuce{font-weight:600}
+.tools .btn{border-radius:4px;font-family:var(--mono);font-size:13px;letter-spacing:.03em;text-transform:uppercase;border-color:rgba(56,189,248,.4);color:var(--txt)}
+#bacct{border-color:rgba(255,138,31,.55)}
+.dock{background:linear-gradient(rgba(7,10,28,0),rgba(7,10,28,.97) 16px)}
+.dock .info{font-family:var(--mono);font-size:12px;letter-spacing:.01em}
+.modal,#pause,#results{background:rgba(5,7,22,.8)}.modal .card{background:#0f1332}
+.acct{border-radius:4px;background:rgba(4,6,22,.45);border:1px solid var(--line)}.acct b{color:var(--acc);font-family:var(--mono)}
+.niv{font-family:var(--mono);font-size:12px;letter-spacing:.02em}.niv b{color:var(--acc)}.niv .g{border-radius:0;height:5px;background:rgba(120,140,255,.16)}.niv .g i{background:linear-gradient(90deg,var(--vio),var(--blu))}
+/* accueil : salles ouvertes */
+.salle{border-radius:4px;border:1px solid var(--line);border-left:3px solid var(--blu);background:rgba(18,22,52,.8)}
+.salle b{font-family:var(--mono);letter-spacing:.04em}.salle small{font-family:var(--mono);font-size:11px}
+.salle i{border-radius:3px;font-family:var(--mono);background:rgba(56,189,248,.15);color:#8fdcff}.salle i.c{background:rgba(255,138,31,.18);color:#ffb469}
+.salle u{border-radius:3px;background:var(--acc);color:#1a0b00;text-transform:uppercase;letter-spacing:.05em;font-size:12px}
+/* grille */
+#ltitle span{font-family:var(--mono);letter-spacing:.06em}
+.adresse{border-radius:4px;border:1px dashed rgba(56,189,248,.5);background:rgba(4,6,22,.55);font-family:var(--mono);font-size:13px}.adresse b{color:var(--blu);font-family:var(--font)}
+.box{border-radius:6px;border:1px solid var(--line);background:var(--card)}.box::before{content:"";position:absolute;left:-1px;top:-1px;width:36%;height:2px;background:linear-gradient(90deg,var(--vio),var(--blu),transparent)}
+.box.vide{border-style:dashed;font-family:var(--mono);font-size:13px;letter-spacing:.04em;text-transform:uppercase}.box.vide::before{display:none}
+.box .nom{font-size:16px}.box .num{border-radius:3px;font-family:var(--mono)}
+.tag{border-radius:3px;font-family:var(--mono);background:var(--acc);color:#1a0b00}.tag.moi{background:rgba(56,189,248,.18);color:#bfe9ff}
+#duo2{font-family:var(--mono);font-size:12px;color:var(--blu)}
+/* classement general */
+.trow{font-family:var(--mono);font-size:13px;border-bottom:1px solid rgba(120,140,255,.14)}.trow span{font-family:var(--font);font-weight:700}
+.trow i{color:var(--blu)}.trow b{color:var(--txt)}.trow.moi{background:rgba(255,138,31,.12);border-radius:0;border-left:3px solid var(--acc)}.trow.moi span{color:var(--acc)}
+/* course */
+.chip{border-radius:6px;border:1px solid var(--line);background:var(--glass);box-shadow:0 6px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(120,140,255,.18)}
+.pos,.spd{border-left:3px solid var(--acc)}.spd{border-left:1px solid var(--line);border-right:3px solid var(--blu)}
+.pos b,.pos span{color:var(--acc);font-family:var(--mono)}.spd b,#htime,.sous,#count,#hpts,.brow,#finb b,.ligne .tp,.ligne .pts,.ligne .rg{font-family:var(--mono)}
+.spd b{color:#fff;text-shadow:0 0 18px rgba(56,189,248,.55)}.spd span,.pos i{font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+.bar{border-radius:0;height:4px;background:rgba(120,140,255,.25)}.dot{border-radius:3px;transform:rotate(45deg)}
+#hpts{color:var(--acc)}
+.jauge .g{border-radius:0;background:rgba(120,140,255,.18)}.jauge .g i{border-radius:0}#helan{background:linear-gradient(90deg,var(--vio),var(--blu),var(--acc))}
+.brow{font-size:12px}.brow u{border-radius:2px}.brow.moi span{color:var(--acc)}.brow i{color:var(--blu)}
+#toast{border-radius:4px;border:1px solid rgba(56,189,248,.45);font-family:var(--mono);font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+#count{text-shadow:0 0 40px rgba(139,92,246,.8),0 8px 40px rgba(0,0,0,.5)}#count.go{color:var(--acc);text-shadow:0 0 40px rgba(255,138,31,.8)}
+#son,#menu{border-radius:6px;border:1px solid var(--line);background:var(--glass)}
+.pad{border-radius:14px;border:1px solid rgba(56,189,248,.45);background:var(--glass)}.pad svg{fill:var(--blu)}.pad.on{background:rgba(255,138,31,.5);border-color:var(--acc)}.pad.on svg{fill:#fff}
+#item{border-radius:14px;border:2px solid var(--acc)}@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(255,138,31,.2)}}
+#hud.turbo{box-shadow:inset 0 0 140px rgba(255,138,31,.35)}
+#finb b{color:var(--acc)}.pop b{color:var(--acc);font-family:var(--mono)}
+/* resultats */
+#results h2{text-transform:uppercase;letter-spacing:.06em;font-weight:900}
+.ligne{border-radius:4px;border:1px solid var(--line);border-left:3px solid var(--blu);background:var(--card)}
+.ligne.moi{border-color:rgba(255,138,31,.6);border-left-color:var(--acc);background:rgba(255,138,31,.1)}
+.ligne .rg{color:var(--acc)}.ligne .aw{border-radius:3px;background:rgba(139,92,246,.3);font-family:var(--mono)}
+#xpl{color:var(--acc);font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
+@media(hover:hover){.btn:hover,.cta.ghost:hover,.adresse:hover{background:rgba(120,140,255,.2);border-color:var(--blu)}.salle:hover:not(:disabled){border-color:var(--blu);background:rgba(30,36,80,.9)}}
+@media(max-width:640px){.pvcard{background:rgba(12,15,40,.97)}.brand h1{font-size:20px}}
+
+/* caracteristiques du bolide */
+#stats{display:grid;gap:5px;margin-top:10px}
+.stat{display:grid;grid-template-columns:104px 1fr 26px;align-items:center;gap:10px}
+.stat em{font-style:normal;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.stat .ct{display:none}
+.stat .sg{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}.stat .sg i{height:9px;background:rgba(120,140,255,.14);transform:skewX(-18deg)}
+.stat .sg i.o{background:var(--blu)}.stat .sg i.p{background:var(--acc);box-shadow:0 0 8px rgba(255,138,31,.6)}.stat .sg i.m{background:rgba(255,90,77,.35)}
+.stat b{font-family:var(--mono);font-size:12px;text-align:right;color:var(--mut)}
+.opt b{display:grid;gap:2px;padding:5px 4px}.opt b small{font-size:10px;font-weight:700;color:var(--blu);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){#stats{grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}.stat{grid-template-columns:1fr;gap:3px}.stat .lg,.stat b{display:none}.stat .ct{display:inline}.stat em{font-size:10px;text-align:center}.stat .sg{gap:1px}.stat .sg i{height:7px;transform:none}}
+@media(max-height:520px) and (min-width:641px){#stats{grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}.stat{grid-template-columns:1fr;gap:3px}.stat .lg,.stat b{display:none}.stat .ct{display:inline}.stat em{font-size:10px;text-align:center}.stat .sg{gap:1px}.stat .sg i{height:6px;transform:none}#preview{height:max(100px,calc(100dvh - 245px))}}
+.ligne .nm{flex:1 1 auto;min-width:64px}
+@media(min-width:641px) and (min-height:521px){#preview{aspect-ratio:auto;height:min(34dvh,400px)}}
+@media(max-height:520px) and (min-width:641px){#preview{height:max(90px,calc(100dvh - 300px))}}
 </style>
 </head>
 <body>
@@ -240,11 +341,11 @@ button,.btn,.cta,.seg a{cursor:pointer;transition:background .15s,transform .1s,
   <div id="duo"><div class="seg"><span class="on">Solo</span><a href="/duo?n=2">2 joueurs</a><a href="/duo?n=3">3 joueurs</a><a href="/duo?n=4">4 joueurs</a></div><p class="cap">À plusieurs : même clavier, écran partagé</p></div>
   <div id="salles" class="hidden"><em>Salles ouvertes</em><div id="slist"></div></div>
   <div class="cols">
-    <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div class="niv" id="niv"></div></div>
+    <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div id="stats"></div><div class="niv" id="niv"></div></div>
     <div class="card"><h2>Atelier</h2><div id="opts"></div><button class="btn" id="rand" style="margin-top:12px">🎲 Au hasard</button></div>
   </div>
   <div class="dock">
-    <p class="info" id="ghint">Tape un nom de salle : elle est créée (publique, visible ici) ou tu la rejoins. Vide : salle privée.</p>
+    <p class="info" id="ghint">Nom de salle : créée (publique) ou rejointe. Vide : salle privée.</p>
     <div class="in">
       <input id="nom" type="text" maxlength="14" placeholder="Ton nom de pilote" autocomplete="off" enterkeyhint="go">
       <input id="room" type="text" maxlength="16" placeholder="Nom de la salle" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="characters" enterkeyhint="go" style="text-transform:uppercase">
@@ -328,21 +429,33 @@ const BODIES=['Classique','Fusée','Baignoire','Caisse en bois','Formule'], WHEE
 const PALETTE=['#ff5a4d','#ff8c1a','#ffc93c','#3ddc84','#29a8ff','#3b4cca','#9b5de5','#ff77a8','#f4f4f4','#2b2f3a'];
 const rnd0=n=>Math.floor(Math.random()*n);
 function shadeHex(hex,k){const n=parseInt(hex.slice(1),16),f=v=>clamp(Math.round(v*k),0,255).toString(16).padStart(2,'0'); return '#'+f(n>>16)+f(n>>8&255)+f(n&255);}
+// Caracteristiques : chaque carrosserie, jeu de roues et aileron deplace cinq curseurs (vitesse, acceleration, adherence,
+// maniabilite, solidite). Chaque piece est a somme nulle : ce qu'on gagne d'un cote, on le perd de l'autre. Pilote et couleurs : aucun effet.
+const STAT_N=['Vitesse','Accélération','Adhérence','Maniabilité','Solidité'], STAT_C=['VIT','ACC','ADH','MAN','SOL'];
+const PART_ST={ b:[[0,0,0,0,0],[2,0,-1,0,-1],[0,-2,1,-1,2],[-2,1,0,0,1],[1,-1,0,2,-2]], w:[[0,0,0,0,0],[1,1,-2,0,0],[0,0,-1,-1,2],[-1,-1,2,0,0]], a:[[0,0,0,0,0],[-1,0,1,0,0],[-1,-1,2,0,0],[0,0,0,1,-1],[0,1,0,-1,0]] };
+function statsOf(c){ c=normCfg(c); const d=[0,0,0,0,0]; for(const k of ['b','w','a']){ const r=PART_ST[k][c[k]]||[]; for(let i=0;i<5;i++)d[i]+=r[i]||0; } return d.map(v=>Math.max(-4,Math.min(4,v))); }
+function physOf(c){ const d=statsOf(c), vit=1+.015*d[0]; return {vit:vit,cd:1/(vit*vit),acc:1+.06*d[1],elan:1+.08*d[1],adh:1+.05*d[2],cen:1-.06*d[2],slip:1-.1*d[2],mud:1-.08*d[2],man:1+.07*d[3],sol:1-.08*d[4]}; }
+let ST=physOf({});
+function partTxt(k,i){ const r=PART_ST[k]&&PART_ST[k][i]; if(!r)return 'Aucun effet'; const t=r.map((v,j)=>v?(v>0?'+':'−')+Math.abs(v)+' '+STAT_C[j]:'').filter(Boolean).join('  '); return t||'Équilibré'; }
+function renderStats(){ const box=$('stats'); if(!box)return; const d=statsOf(cfg); box.innerHTML='';
+  d.forEach((v,i)=>{ const n=6+v, e=document.createElement('div'); e.className='stat'; e.title=STAT_N[i]; let seg=''; for(let k=0;k<10;k++)seg+='<i class="'+(k<n?(v>0&&k>=6?'p':v<0&&k>=n?'':'o'):(v<0&&k<6?'m':''))+'"></i>';
+    e.innerHTML='<em><span class="lg">'+STAT_N[i]+'</span><span class="ct">'+STAT_C[i]+'</span></em><div class="sg">'+seg+'</div><b>'+(v>0?'+'+v:v<0?'−'+(-v):'0')+'</b>'; box.appendChild(e); }); }
 function normCfg(c){c=c||{}; const i=(v,n)=>{v=Math.floor(+v||0); return v>=0&&v<n?v:0;}, col=(v,d)=>/^#[0-9a-fA-F]{6}$/.test(v||'')?v:d; return {b:i(c.b,5),w:i(c.w,4),p:i(c.p,5),a:i(c.a,5),c:col(c.c,'#ff5a4d'),h:col(c.h,'#f4f4f4')};}
 const randCfg=()=>({b:rnd0(5),w:rnd0(4),p:rnd0(5),a:rnd0(5),c:PALETTE[rnd0(8)],h:PALETTE[rnd0(10)]});
 let cfg; try{cfg=JSON.parse(localStorage.getItem('caisse'+(PN||'')));}catch(_){} cfg=cfg?normCfg(cfg):randCfg();
 let previewDirty=true;
-function saveCfg(){previewDirty=true; try{localStorage.setItem('caisse'+(PN||''),JSON.stringify(cfg));}catch(_){} if(typeof account!=='undefined'&&account&&session){ clearTimeout(cfgTimer); cfgTimer=setTimeout(()=>api({action:'cfg',session:session,cfg:cfg}),900); } }
+function saveCfg(){previewDirty=true; renderStats(); try{localStorage.setItem('caisse'+(PN||''),JSON.stringify(cfg));}catch(_){} if(typeof account!=='undefined'&&account&&session){ clearTimeout(cfgTimer); cfgTimer=setTimeout(()=>api({action:'cfg',session:session,cfg:cfg}),900); } }
 function buildOpts(){
   const box=$('opts'); box.innerHTML='';
   [['b','Carrosserie',BODIES],['w','Roues',WHEELS],['p','Pilote',PILOTS],['a','Aileron',WINGS]].forEach(o=>{
     const d=document.createElement('div'); d.className='opt'; d.innerHTML='<label>'+o[1]+'</label><button class="btn">◀</button><b></b><button class="btn">▶</button>';
-    const lab=d.querySelector('b'), bs=d.querySelectorAll('button'), up=()=>{lab.textContent=o[2][cfg[o[0]]];};
+    const lab=d.querySelector('b'), bs=d.querySelectorAll('button'), up=()=>{lab.innerHTML='<span></span><small></small>'; lab.firstChild.textContent=o[2][cfg[o[0]]]; lab.lastChild.textContent=partTxt(o[0],cfg[o[0]]);};
     bs[0].onclick=()=>{cfg[o[0]]=(cfg[o[0]]+o[2].length-1)%o[2].length; up(); saveCfg();}; bs[1].onclick=()=>{cfg[o[0]]=(cfg[o[0]]+1)%o[2].length; up(); saveCfg();}; up(); box.appendChild(d);});
   [['c','Couleur'],['h','Casque']].forEach(o=>{
     const d=document.createElement('div'); d.className='optc'; d.innerHTML='<label>'+o[1]+'</label><div class="rang"></div>'; const r=d.querySelector('.rang');
     PALETTE.forEach(col=>{const b=document.createElement('button'); b.className='pastille'+(cfg[o[0]]===col?' on':''); b.style.background=col; b.onclick=()=>{cfg[o[0]]=col; r.querySelectorAll('.pastille').forEach(x=>x.classList.remove('on')); b.classList.add('on'); saveCfg();}; r.appendChild(b);});
     box.appendChild(d);});
+  renderStats();
 }
 $('rand').onclick=()=>{cfg=randCfg(); buildOpts(); saveCfg();};
 
@@ -977,6 +1090,7 @@ function startRace(m){
   raceBots.forEach(b=>{ const o=others[b.id]={id:b.id,bot:true,flag:'🤖',x:lanes[b.slot],s:rows[b.slot],nx:lanes[b.slot],ns:rows[b.slot],v:0,a:0,na:0,d:0,nd:0,st:0,nst:0,rep:0,fin:null,got:true,name:b.name,color:b.color,car:null,dot:mkDot(b.color,false),b:null};
     o.car=buildCar(b.cfg); const fl=nameFlag('🤖 '+b.name,b.color); o.fl=fl; o.car.root.add(fl); o.car.mats.push(fl.material); world.scene.add(o.car.root); });
   myCar=buildCar(cfg); world.scene.add(myCar.root);
+  ST=physOf(cfg);
   me={x:lanes[mySlot],s:rows[mySlot],v:0,steer:0,air:0,vy:0,slip:0,drift:0,mud:0,wall:0,bump:0,fin:null,dmg:0,clean:0,repair:0,dot:mkDot(myColor,true),nod:0,score:0,hits:0,item:true,pull:Math.random()<.5?-1:1,jolt:1,kick:0,turbo:0,crashed:false,maxed:false,xpDone:false};
   prevRank=null; splats=[]; fireReq=false; wheelN=0; $('pops').innerHTML=''; $('xpl').textContent=''; $('itemk').textContent=TOUCH?'ROUE':(EMBED?['Z','↑','I','G'][PN-1]:'↑')+' ROUE';
   goAt=performance.now()+(m.countdown||4000); raceT0=0; lastBeep=9; shake=0;
@@ -1058,7 +1172,7 @@ function drawSplats(now){ if(!splats.length){ if(splatDirty){sctx.clearRect(0,0,
         c.fillStyle='rgba(255,255,255,'+.95*al+')'; c.beginPath(); c.ellipse(bx-br*.38,by-br*.38,br*.2,br*.11,-.7,0,7); c.fill();} }
     else { const g=c.createRadialGradient(s.x-r*.3,y-r*.3,r*.1,s.x,y,r); g.addColorStop(0,'rgba(255,255,255,'+.7*al+')'); g.addColorStop(1,'rgba(120,190,245,'+.45*al+')'); c.fillStyle=g; c.beginPath(); c.ellipse(s.x,y+t*r*3,r*.8,r*(1+t),0,0,7); c.fill(); } }
   splats=splats.filter(s=>!s.dead); }
-function hurt(n,why){ if(me.fin!=null||me.repair>0)return; me.hits++; me.dmg=Math.min(100,me.dmg+n); me.clean=0; const e=$('etat'); e.classList.remove('choc'); void e.offsetWidth; e.classList.add('choc');
+function hurt(n,why){ if(me.fin!=null||me.repair>0)return; me.hits++; me.dmg=Math.min(100,me.dmg+n*ST.sol); me.clean=0; const e=$('etat'); e.classList.remove('choc'); void e.offsetWidth; e.classList.add('choc');
   if(me.dmg>=100){me.repair=2.8; toast('Caisse en miettes'); thud(200,.8,.9); $('repair').classList.remove('hidden');}
   else if(me.dmg>=72&&me.dmg-n<72)toast('Roue perdue');
   else if(me.dmg>=40&&me.dmg-n<40)toast('Direction abîmée'); }
@@ -1068,28 +1182,28 @@ function update(dt,now){
   const left=Math.ceil((goAt-now)/1000); if(!go&&left<lastBeep&&left<=3){lastBeep=left; beep(440,.18,.12);}
   fr(me.s,F1); const sp=me.v/MAXV, hot=me.dmg/100;
   let target=(keys.r?1:0)-(keys.l?1:0); if(me.fin!=null)target=0; if(me.repair>0)target=0;
-  me.steer+=(target-me.steer)*Math.min(1,dt*(me.slip>0?2:9-5.5*hot));
+  me.steer+=(target-me.steer)*Math.min(1,dt*(me.slip>0?2:(9-5.5*hot)*ST.man));
   if(go){
     const boost=s01(me.clean/7);
-    const grip=(me.air>0?0.3:me.slip>0?0.45:1)*(1-.3*hot)*THEMES[tr.theme].grip;
+    const grip=(me.air>0?0.3:me.slip>0?0.45:1)*(1-.3*hot)*THEMES[tr.theme].grip*ST.adh;
     me.x+=me.steer*dt*5.4*grip*(0.5+0.5*Math.min(1,sp))*Math.min(1,me.v/2.5);
-    if(me.air<=0)me.x+=dt*F1.k*me.v*me.v*0.2*(1-Math.min(.55,Math.abs(F1.b)*2.4));
+    if(me.air<=0)me.x+=dt*F1.k*me.v*me.v*0.2*ST.cen*(1-Math.min(.55,Math.abs(F1.b)*2.4));
     if(me.slip>0){me.slip-=dt; me.x+=(Math.sin(now*.009)*2.6*sp+me.drift)*dt;}
     // plus la caisse est abimee, plus elle est dure a tenir : flottement, tirage d'un cote, a-coups
     if(me.air<=0&&me.fin==null&&me.repair<=0){ me.x+=(Math.sin(now*.011)+.6*Math.sin(now*.023+1.3))*hot*hot*2.4*sp*dt; if(hot>.2)me.x+=me.pull*(hot-.2)*1.9*sp*dt;
       if(hot>.4){ me.jolt-=dt; if(me.jolt<=0){me.jolt=.8+Math.random()*2.4*(1.4-hot); me.kick=(Math.random()<.5?-1:1)*(1+hot*2.4); shake=Math.max(shake,.14*hot);} } me.x+=me.kick*dt; me.kick*=Math.pow(.02,dt); }
     // vitesse : pente, trainee, degats, elan
-    let a=GEFF*F1.slope-CD*(1+hot*.9)*(1-.42*boost)*me.v*me.v-.2+boost*1.5;
+    let a=ST.acc*(GEFF*F1.slope-CD*ST.cd*(1+hot*.9)*(1-.42*boost)*me.v*me.v)-.2+boost*1.5;
     if(me.air>0)a=-CD*me.v*me.v*.4;
     if(Math.abs(me.x)>HALF+.25&&me.air<=0){a-=me.v*1.3; me.clean=Math.min(me.clean,1.5); if(Math.random()<dt*30)puff(myCar.root.position.x,myCar.root.position.y,myCar.root.position.z,1,0x6b8f3a,{v:3,up:2,size:.12});}
     if(me.fin!=null)a=me.crashed?-80:-1.2;
     if(me.repair>0)a=-20;
     if(me.air<=0)for(const p of tr.patches){ const pu=(me.s-p.s)/(p.rs+.4), pw=(me.x-p.x)/(p.rx+.35); if(pu*pu+pw*pw<1){
       if(p.type==='turbo'){ if(now-(p.used||0)>1500&&me.fin==null){p.used=now; me.v=Math.min(MAXV*1.3,me.v+5.5); me.turbo=1.6; addScore(30,'Turbo'); beep(900,.25,.12); puff(myCar.root.position.x,myCar.root.position.y+.3,myCar.root.position.z,12,[0xffd23f,0xff8c1a],{v:5,up:3,size:.09});} }
-      else if(p.type==='savon'){ if(me.slip<=0){me.drift=(Math.random()<.5?-1:1)*1.8; thud(2500,.4,.25);} splash('savon',now); me.slip=1.5; if(Math.random()<dt*40)puff(myCar.root.position.x,myCar.root.position.y+.3,myCar.root.position.z,1,0xffffff,{v:2,up:3,g:-1,size:.2,life:1.2}); }
-      else { a-=me.v*2.3; me.clean=0; splash(p.type,now); if(now-me.mud>300){me.mud=now; thud(700,.3,.35); shake=Math.max(shake,.12);} puff(myCar.root.position.x,myCar.root.position.y+.2,myCar.root.position.z,2,p.type==='boue'?0x5d3f24:0x8fd0ff,{v:6,up:5,size:.16}); } } }
-    me.v+=a*dt; me.v=me.crashed?0:me.repair>0?Math.max(me.v,0):Math.max(me.v,me.fin!=null?9:3.2); me.turbo-=dt; me.v=Math.min(me.v,MAXV*(1.02+.22*boost+(me.turbo>0?.25:0)));
-    if(me.repair<=0&&me.fin==null)me.clean+=dt; if(me.clean<6)me.maxed=false; else if(me.clean>=7&&!me.maxed&&me.fin==null){me.maxed=true; addScore(100,'Élan max');}
+      else if(p.type==='savon'){ if(me.slip<=0){me.drift=(Math.random()<.5?-1:1)*1.8; thud(2500,.4,.25);} splash('savon',now); me.slip=1.5*ST.slip; if(Math.random()<dt*40)puff(myCar.root.position.x,myCar.root.position.y+.3,myCar.root.position.z,1,0xffffff,{v:2,up:3,g:-1,size:.2,life:1.2}); }
+      else { a-=me.v*2.3*ST.mud; me.clean=0; splash(p.type,now); if(now-me.mud>300){me.mud=now; thud(700,.3,.35); shake=Math.max(shake,.12);} puff(myCar.root.position.x,myCar.root.position.y+.2,myCar.root.position.z,2,p.type==='boue'?0x5d3f24:0x8fd0ff,{v:6,up:5,size:.16}); } } }
+    me.v+=a*dt; me.v=me.crashed?0:me.repair>0?Math.max(me.v,0):Math.max(me.v,me.fin!=null?9:3.2); me.turbo-=dt; me.v=Math.min(me.v,MAXV*ST.vit*(1.02+.22*boost+(me.turbo>0?.25:0)));
+    if(me.repair<=0&&me.fin==null)me.clean+=dt*ST.elan; if(me.clean<6)me.maxed=false; else if(me.clean>=7&&!me.maxed&&me.fin==null){me.maxed=true; addScore(100,'Élan max');}
     const prevS=me.s; me.s=Math.min(me.s+me.v*dt,tr.wallS-1.3);
     if(!me.crashed&&me.s>=tr.wallS-1.35){me.crashed=true; crashWall(myCar,me.s,me.x,Math.max(me.v,10)); me.v=0; shake=1; thud(220,.9,1); thud(900,.5,.6);}
     if(me.air>0||me.vy>0){ me.air+=me.vy*dt; me.vy-=14*dt; if(me.air<=0){ const hard=-me.vy; me.air=0; me.vy=0; shake=Math.max(shake,.3); thud(300,.3,.6); me.nod=.25; puff(myCar.root.position.x,myCar.root.position.y,myCar.root.position.z,8,0xb9b2a3,{v:5,up:2,size:.14}); if(hard>7)hurt(5); } }
@@ -1244,7 +1358,7 @@ function frame(now){
 try{$('nom').value=localStorage.getItem('pilote'+(PN||''))||(EMBED?'Joueur '+PN:'');}catch(_){}
 $('nom').addEventListener('input',()=>{try{localStorage.setItem('pilote'+(PN||''),$('nom').value);}catch(_){}});
 buildOpts(); initPreview(); showLevel(); renderAcct(); if(!LAN&&session)api({action:'me',session:session}).then(r=>{ if(r.ok)setAccount(r.account); else if(r.err==='session')setAccount(null,''); }); if(EMBED||innerWidth<700){$('duo').classList.add('hidden');$('duo2').classList.add('hidden');}
-window.G={addScore:addScore,splash:splash,get me(){return me;},get track(){return track;},keys:keys,get others(){return others;},get phase(){return phase;},get world(){return world;},DS:DS};
+window.G={get ST(){return ST;},statsOf:statsOf,addScore:addScore,splash:splash,get me(){return me;},get track(){return track;},keys:keys,get others(){return others;},get phase(){return phase;},get world(){return world;},DS:DS};
 </script>
 </body>
 </html>

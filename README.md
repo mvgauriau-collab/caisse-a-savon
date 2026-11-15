@@ -61,6 +61,8 @@ Trois ambiances, au choix de l'hôte sur la grille (ou au hasard) : Campagne, D�
 - Un nom de salle n'est pas un mot de passe : quiconque le devine peut entrer s'il reste une place.
 - Le bouton Inviter de la grille partage un lien qui pré-remplit le nom de la salle.
 - Depuis la course : menu (ou Échap) pour abandonner et revenir à la grille, ou quitter la salle. Depuis la grille et les résultats : quitter la salle.
+- Caractéristiques des bolides : carrosserie, roues et aileron déplacent cinq curseurs (vitesse, accélération, adhérence, maniabilité, solidité). Chaque pièce est à somme nulle, le pilote et les couleurs n'ont aucun effet. Tables `PART_ST` et `physOf` dans `public/index.html`. Les bots gardent un réglage neutre.
+- Habillage « tech » violet, bleu, orange : variables CSS en fin de feuille de style.
 - Le salon `JGA` a son circuit : Bournezeau (Vendée), choisi d'office et proposé seulement dans ce salon (et en LAN). Tracé fixe relevé à l'œil sur une vue satellite du bourg, du nord au sud : rue principale, place de la Mairie, le S du centre, carrefour de la rue Jean Grolleau, cimetière, puis rue de l'Armistice (D48) jusqu'au rond-point. Longueurs doublées pour que la course dure, bâtiments stylisés, enseignes génériques. Données dans `BZ_PLAN` (`public/index.html`). Pour réserver un autre circuit à un salon : table `SPECIAL` dans `lib/game.js`.
 - Classement général des comptes (niveau, victoires, podiums), accessible depuis l'atelier et la grille (`gd:lb:*` dans Redis).
 - 8 pilotes maximum par salle (humains et bots confondus, départ sur deux lignes), autant de salles en parallèle que voulu. L'écran partagé sur un clavier reste limité à 4.
