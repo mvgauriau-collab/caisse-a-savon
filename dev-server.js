@@ -20,7 +20,7 @@ const server = http.createServer(async (req, res) => {
   let p = new URL(req.url, 'http://x').pathname;
   if (p === '/api/account') {   // meme logique que api/account.js, branchee sur le store local
     let raw = ''; for await (const c of req) raw += c; let b = {}; try { b = JSON.parse(raw || '{}'); } catch (_) {}
-    const f = { signup: () => accounts.signup(b.pseudo, b.code, b.pays), pays: () => accounts.setPays(b.session, b.pays), top: () => accounts.top(b.by, b.session), rooms: () => listRooms(store), login: () => accounts.login(b.pseudo, b.code), me: () => accounts.me(b.session), logout: () => accounts.logout(b.session), cfg: () => accounts.setCfg(b.session, b.cfg) }[b.action];
+    const f = { signup: () => accounts.signup(b.pseudo, b.code, b.pays), pays: () => accounts.setPays(b.session, b.pays), top: () => accounts.top(b.by, b.session), rooms: () => listRooms(store), crate: () => accounts.crate(b.session), login: () => accounts.login(b.pseudo, b.code), me: () => accounts.me(b.session), logout: () => accounts.logout(b.session), cfg: () => accounts.setCfg(b.session, b.cfg) }[b.action];
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(f ? await f() : { ok: false, err: 'action' })); return;
   }
   if (p === '/') p = '/index.html'; if (!path.extname(p)) p += '.html';

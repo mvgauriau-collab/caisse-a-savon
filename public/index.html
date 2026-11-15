@@ -331,6 +331,23 @@ input::placeholder{color:#66709c;text-transform:none;letter-spacing:0}
 .ligne .nm{flex:1 1 auto;min-width:64px}
 @media(min-width:641px) and (min-height:521px){#preview{aspect-ratio:auto;height:min(34dvh,400px)}}
 @media(max-height:520px) and (min-width:641px){#preview{height:max(90px,calc(100dvh - 300px))}}
+
+/* caisses a ouvrir */
+#bcrate{width:100%;margin-top:10px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:10px;color:var(--mut)}
+#bcrate.on{color:#1a0b00;background:linear-gradient(100deg,var(--acc),#ff6a00);border-color:transparent;font-weight:800;animation:cpulse 1.4s infinite}#bcrate.gros{background:linear-gradient(100deg,#ffd23f,#ff8a1f)}
+#bcrate:disabled{cursor:default}
+@keyframes cpulse{50%{box-shadow:0 0 0 6px rgba(255,138,31,.22)}}
+.opt label i{font-style:normal;display:block;color:var(--blu);font-size:10px;margin-top:2px}
+#cratem .card{max-width:560px;text-align:center}
+#reel{position:relative;overflow:hidden;height:118px;border:1px solid var(--line);background:rgba(4,6,22,.7);margin:6px 0 12px}
+#reel>span{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--acc);box-shadow:0 0 12px var(--acc);z-index:2}
+#strip{display:flex;gap:6px;padding:8px 0;will-change:transform}
+.tuile{flex:0 0 92px;height:100px;background:rgba(18,22,52,.95);border:1px solid var(--line);border-bottom:4px solid var(--rc,#38bdf8);display:grid;place-items:center;align-content:center;gap:4px;font-size:11px;font-weight:700;padding:4px}
+.tuile u{text-decoration:none;font-size:30px;line-height:1}.tuile s{text-decoration:none;display:block;width:30px;height:30px;border:1px solid rgba(255,255,255,.4)}.tuile span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:84px}
+#cres{display:grid;justify-items:center;gap:4px;margin:4px 0 6px;animation:cin .45s}
+@keyframes cin{0%{transform:scale(.7);opacity:0}100%{transform:none;opacity:1}}
+#cimg{width:210px;height:140px;border:1px solid var(--rc);box-shadow:0 0 34px var(--rc);background:radial-gradient(120% 100% at 50% 20%,#2b2f7a 0%,#11143a 60%,#080a20 100%);display:grid;place-items:center}#cimg img{width:100%;height:100%;object-fit:contain}
+#cname{font-size:24px;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}#crar{font-style:normal;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--rc)}#cfx{font-family:var(--mono);color:var(--blu);font-size:12px}
 </style>
 </head>
 <body>
@@ -341,7 +358,7 @@ input::placeholder{color:#66709c;text-transform:none;letter-spacing:0}
   <div id="duo"><div class="seg"><span class="on">Solo</span><a href="/duo?n=2">2 joueurs</a><a href="/duo?n=3">3 joueurs</a><a href="/duo?n=4">4 joueurs</a></div><p class="cap">À plusieurs : même clavier, écran partagé</p></div>
   <div id="salles" class="hidden"><em>Salles ouvertes</em><div id="slist"></div></div>
   <div class="cols">
-    <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div id="stats"></div><div class="niv" id="niv"></div></div>
+    <div class="card pvcard"><h2>Ta caisse</h2><canvas id="preview"></canvas><div id="stats"></div><div class="niv" id="niv"></div><button class="btn" id="bcrate"></button></div>
     <div class="card"><h2>Atelier</h2><div id="opts"></div><button class="btn" id="rand" style="margin-top:12px">🎲 Au hasard</button></div>
   </div>
   <div class="dock">
@@ -354,6 +371,11 @@ input::placeholder{color:#66709c;text-transform:none;letter-spacing:0}
     <p class="info" id="gmsg"></p>
   </div>
 </div>
+<div id="cratem" class="modal hidden"><div class="card"><h2 id="ctitle">Caisse</h2>
+  <div id="reel"><div id="strip"></div><span></span></div>
+  <div id="cres" class="hidden"><div id="cimg"></div><b id="cname"></b><em id="crar"></em><small id="cfx"></small></div>
+  <p class="info" id="cmsg"></p>
+  <div class="ract" style="max-width:none"><button class="cta hidden" id="cequip">Équiper</button><button class="cta ghost hidden" id="cnext">Ouvrir la suivante</button><button class="cta ghost" id="cclose">Fermer</button></div></div></div>
 <div id="acctm" class="modal hidden"><div class="card"><h2>Compte pilote</h2><div class="acct" id="acct"></div><button class="cta ghost" id="acctx">Fermer</button></div></div>
 
 <!-- GRILLE -->
@@ -425,14 +447,14 @@ const PN=+new URLSearchParams(location.search).get('p')||0, EMBED=PN>0&&window.p
 const KEYS_TXT=EMBED?['Q D : tourner · Z : roue','← → : tourner · ↑ : roue','J L : tourner · I : roue','V N : tourner · G : roue'][PN-1]||'':'Flèches : tourner · ↑ : roue';
 
 /* ============================================================ ATELIER (personnalisation, purement cosmetique) */
-const BODIES=['Classique','Fusée','Baignoire','Caisse en bois','Formule'], WHEELS=['Kart','Vélo','Bois','Cross'], PILOTS=['Casque','Aviateur','Viking','Lapin','Plot'], WINGS=['Aucun','Classique','Double','Requin','Drapeau'];
+const BODIES=['Classique','Fusée','Baignoire','Caisse en bois','Formule','Tonneau','Canard'], WHEELS=['Kart','Vélo','Bois','Cross'], PILOTS=['Casque','Aviateur','Viking','Lapin','Plot'], WINGS=['Aucun','Classique','Double','Requin','Drapeau'];
 const PALETTE=['#ff5a4d','#ff8c1a','#ffc93c','#3ddc84','#29a8ff','#3b4cca','#9b5de5','#ff77a8','#f4f4f4','#2b2f3a'];
 const rnd0=n=>Math.floor(Math.random()*n);
 function shadeHex(hex,k){const n=parseInt(hex.slice(1),16),f=v=>clamp(Math.round(v*k),0,255).toString(16).padStart(2,'0'); return '#'+f(n>>16)+f(n>>8&255)+f(n&255);}
 // Caracteristiques : chaque carrosserie, jeu de roues et aileron deplace cinq curseurs (vitesse, acceleration, adherence,
 // maniabilite, solidite). Chaque piece est a somme nulle : ce qu'on gagne d'un cote, on le perd de l'autre. Pilote et couleurs : aucun effet.
 const STAT_N=['Vitesse','Accélération','Adhérence','Maniabilité','Solidité'], STAT_C=['VIT','ACC','ADH','MAN','SOL'];
-const PART_ST={ b:[[0,0,0,0,0],[2,0,-1,0,-1],[0,-2,1,-1,2],[-2,1,0,0,1],[1,-1,0,2,-2]], w:[[0,0,0,0,0],[1,1,-2,0,0],[0,0,-1,-1,2],[-1,-1,2,0,0]], a:[[0,0,0,0,0],[-1,0,1,0,0],[-1,-1,2,0,0],[0,0,0,1,-1],[0,1,0,-1,0]] };
+const PART_ST={ b:[[0,0,0,0,0],[2,0,-1,0,-1],[0,-2,1,-1,2],[-2,1,0,0,1],[1,-1,0,2,-2],[-1,0,0,-1,2],[0,1,1,0,-2]], w:[[0,0,0,0,0],[1,1,-2,0,0],[0,0,-1,-1,2],[-1,-1,2,0,0]], a:[[0,0,0,0,0],[-1,0,1,0,0],[-1,-1,2,0,0],[0,0,0,1,-1],[0,1,0,-1,0]] };
 function statsOf(c){ c=normCfg(c); const d=[0,0,0,0,0]; for(const k of ['b','w','a']){ const r=PART_ST[k][c[k]]||[]; for(let i=0;i<5;i++)d[i]+=r[i]||0; } return d.map(v=>Math.max(-4,Math.min(4,v))); }
 function physOf(c){ const d=statsOf(c), vit=1+.015*d[0]; return {vit:vit,cd:1/(vit*vit),acc:1+.06*d[1],elan:1+.08*d[1],adh:1+.05*d[2],cen:1-.06*d[2],slip:1-.1*d[2],mud:1-.08*d[2],man:1+.07*d[3],sol:1-.08*d[4]}; }
 let ST=physOf({});
@@ -440,20 +462,33 @@ function partTxt(k,i){ const r=PART_ST[k]&&PART_ST[k][i]; if(!r)return 'Aucun ef
 function renderStats(){ const box=$('stats'); if(!box)return; const d=statsOf(cfg); box.innerHTML='';
   d.forEach((v,i)=>{ const n=6+v, e=document.createElement('div'); e.className='stat'; e.title=STAT_N[i]; let seg=''; for(let k=0;k<10;k++)seg+='<i class="'+(k<n?(v>0&&k>=6?'p':v<0&&k>=n?'':'o'):(v<0&&k<6?'m':''))+'"></i>';
     e.innerHTML='<em><span class="lg">'+STAT_N[i]+'</span><span class="ct">'+STAT_C[i]+'</span></em><div class="sg">'+seg+'</div><b>'+(v>0?'+'+v:v<0?'−'+(-v):'0')+'</b>'; box.appendChild(e); }); }
-function normCfg(c){c=c||{}; const i=(v,n)=>{v=Math.floor(+v||0); return v>=0&&v<n?v:0;}, col=(v,d)=>/^#[0-9a-fA-F]{6}$/.test(v||'')?v:d; return {b:i(c.b,5),w:i(c.w,4),p:i(c.p,5),a:i(c.a,5),c:col(c.c,'#ff5a4d'),h:col(c.h,'#f4f4f4')};}
-const randCfg=()=>({b:rnd0(5),w:rnd0(4),p:rnd0(5),a:rnd0(5),c:PALETTE[rnd0(8)],h:PALETTE[rnd0(10)]});
-let cfg; try{cfg=JSON.parse(localStorage.getItem('caisse'+(PN||'')));}catch(_){} cfg=cfg?normCfg(cfg):randCfg();
+function normCfg(c){c=c||{}; const i=(v,n)=>{v=Math.floor(+v||0); return v>=0&&v<n?v:0;}, col=(v,d)=>/^#[0-9a-fA-F]{6}$/.test(v||'')?v:d; return {b:i(c.b,7),w:i(c.w,4),p:i(c.p,5),a:i(c.a,5),c:col(c.c,'#ff5a4d'),h:col(c.h,'#f4f4f4')};}
+// --- objets a debloquer : une caisse par niveau atteint, un gros lot tous les 10 niveaux (tirage cote serveur pour les comptes)
+const LOOT={commun:['k0','k1','k2','k3','k4','k5'],rare:['w1','w3','p1','p2','p3','a2','a3','a4'],epique:['b1','b2','b4'],gros:['b5','b6']}, LOOT_ALL=[].concat(LOOT.commun,LOOT.rare,LOOT.epique,LOOT.gros);
+const PAINTS=[['#d4a017','Or'],['#cfd6e0','Chrome'],['#39ff14','Néon vert'],['#141421','Nuit'],['#ff2bd6','Néon rose'],['#19e6d2','Turquoise']];
+const RAR_N={commun:'Commun',rare:'Rare',epique:'Épique',gros:'Gros lot'}, RAR_C={commun:'#38bdf8',rare:'#8b5cf6',epique:'#ff8a1f',gros:'#ffd23f'}, DEPART={b:[0,3],w:[0,2],p:[0,4],a:[0,1]};
+const rarOf=id=>{for(const r in LOOT)if(LOOT[r].includes(id))return r; return 'commun';};
+function itemInfo(id){ const t=id[0], i=+id.slice(1); if(t==='k')return {type:'Peinture',name:PAINTS[i][1],ico:'🎨',col:PAINTS[i][0],fx:'Aucun effet'}; const L={b:['Carrosserie',BODIES,'🏎️'],w:['Roues',WHEELS,'🛞'],p:['Pilote',PILOTS,'🪖'],a:['Aileron',WINGS,'🪽']}[t]; return {type:L[0],name:L[1][i],ico:L[2],key:t,idx:i,fx:partTxt(t,i)}; }
+const acctSafe=()=>{try{return account;}catch(_){return null;}};
+const lootLocal=()=>{try{const o=JSON.parse(localStorage.getItem('gdloot'+(PN||''))); if(o&&Array.isArray(o.inv))return o;}catch(_){} return {inv:[],opened:0};};
+const inv=()=>{const a=acctSafe(); return a?(a.inv||[]):lootLocal().inv;}, openedN=()=>{const a=acctSafe(); return a?(a.opened||0):lootLocal().opened;};
+const owns=(k,i)=>DEPART[k].includes(i)||inv().includes(k+i), ownedIdx=(k,n)=>{const o=[]; for(let i=0;i<n;i++)if(owns(k,i))o.push(i); return o;};
+const paintsOwned=()=>PAINTS.filter((q,i)=>inv().includes('k'+i)).map(q=>q[0]);
+function fixCfg(){ if(!cfg)return; for(const k of ['b','w','p','a'])if(!owns(k,cfg[k]))cfg[k]=0; const lock=PAINTS.filter((q,i)=>!inv().includes('k'+i)).map(q=>q[0]); if(lock.includes(cfg.c))cfg.c=PALETTE[0]; if(lock.includes(cfg.h))cfg.h='#f4f4f4'; }
+const pickO=(k,n)=>{const o=ownedIdx(k,n); return o[rnd0(o.length)];};
+const randCfg=()=>({b:pickO('b',7),w:pickO('w',4),p:pickO('p',5),a:pickO('a',5),c:PALETTE[rnd0(8)],h:PALETTE[rnd0(10)]});
+let cfg; try{cfg=JSON.parse(localStorage.getItem('caisse'+(PN||'')));}catch(_){} cfg=cfg?normCfg(cfg):randCfg(); fixCfg();
 let previewDirty=true;
 function saveCfg(){previewDirty=true; renderStats(); try{localStorage.setItem('caisse'+(PN||''),JSON.stringify(cfg));}catch(_){} if(typeof account!=='undefined'&&account&&session){ clearTimeout(cfgTimer); cfgTimer=setTimeout(()=>api({action:'cfg',session:session,cfg:cfg}),900); } }
 function buildOpts(){
   const box=$('opts'); box.innerHTML='';
   [['b','Carrosserie',BODIES],['w','Roues',WHEELS],['p','Pilote',PILOTS],['a','Aileron',WINGS]].forEach(o=>{
-    const d=document.createElement('div'); d.className='opt'; d.innerHTML='<label>'+o[1]+'</label><button class="btn">◀</button><b></b><button class="btn">▶</button>';
+    const d=document.createElement('div'); d.className='opt'; d.innerHTML='<label>'+o[1]+'<i>'+ownedIdx(o[0],o[2].length).length+'/'+o[2].length+'</i></label><button class="btn">◀</button><b></b><button class="btn">▶</button>';
     const lab=d.querySelector('b'), bs=d.querySelectorAll('button'), up=()=>{lab.innerHTML='<span></span><small></small>'; lab.firstChild.textContent=o[2][cfg[o[0]]]; lab.lastChild.textContent=partTxt(o[0],cfg[o[0]]);};
-    bs[0].onclick=()=>{cfg[o[0]]=(cfg[o[0]]+o[2].length-1)%o[2].length; up(); saveCfg();}; bs[1].onclick=()=>{cfg[o[0]]=(cfg[o[0]]+1)%o[2].length; up(); saveCfg();}; up(); box.appendChild(d);});
+    const mv=dr=>{ const n=o[2].length; let i=cfg[o[0]]; for(let t=0;t<n;t++){ i=(i+dr+n)%n; if(owns(o[0],i))break; } cfg[o[0]]=i; up(); saveCfg(); }; bs[0].onclick=()=>mv(-1); bs[1].onclick=()=>mv(1); up(); box.appendChild(d);});
   [['c','Couleur'],['h','Casque']].forEach(o=>{
     const d=document.createElement('div'); d.className='optc'; d.innerHTML='<label>'+o[1]+'</label><div class="rang"></div>'; const r=d.querySelector('.rang');
-    PALETTE.forEach(col=>{const b=document.createElement('button'); b.className='pastille'+(cfg[o[0]]===col?' on':''); b.style.background=col; b.onclick=()=>{cfg[o[0]]=col; r.querySelectorAll('.pastille').forEach(x=>x.classList.remove('on')); b.classList.add('on'); saveCfg();}; r.appendChild(b);});
+    PALETTE.concat(paintsOwned()).forEach(col=>{const b=document.createElement('button'); b.className='pastille'+(cfg[o[0]]===col?' on':''); b.style.background=col; b.onclick=()=>{cfg[o[0]]=col; r.querySelectorAll('.pastille').forEach(x=>x.classList.remove('on')); b.classList.add('on'); saveCfg();}; r.appendChild(b);});
     box.appendChild(d);});
   renderStats();
 }
@@ -503,12 +538,26 @@ function buildCar(c){
     add(nose,box(.62,.3,.46),wd,0,.15,.76); add(nose,box(.74,.09,.07),white,0,.12,1.02); add(nose,box(.14,.095,.075),paint2,-.2,.12,1.02); add(nose,box(.14,.095,.075),paint2,.2,.12,1.02);
     add(tail,box(.66,.62,.3),wd,0,.31,-.68); add(tail,box(.7,.06,.34),wd2,0,.6,-.68); add(tail,new THREE.TorusGeometry(.12,.035,8,16),mk({color:0xc9b27c,roughness:.9}),0,.36,-.85);
     headY=.74; tailTop=.64; tailZ=-.78;
-  } else { // Formule
+  } else if(c.b===4){ // Formule
     add(mid,prism([[-.55,0],[-.55,.38],[-.3,.46],[0,.46],[.12,.28],[.45,.24],[.45,0]],.5,.06),paint);
     for(const sd of[-1,1])add(mid,prism([[-.5,0],[-.5,.26],[.2,.26],[.36,0]],.22,.04),paint2,sd*.37,0,0); add(mid,box(.18,.14,.26),dark,0,.5,-.42);
     add(nose,prism([[.45,0],[.45,.24],[1.15,.1],[1.2,.05],[1.2,0]],.3,.05),paint); add(nose,box(1.3,.035,.22),paint2,0,.03,1.12); for(const sd of[-1,1])add(nose,box(.03,.14,.26),white,sd*.65,.08,1.12);
     add(tail,prism([[-.55,0],[-.55,.38],[-.75,.5],[-1.05,.3],[-1.05,0]],.4,.05),paint); add(tail,box(.5,.05,.2),dark,0,.06,-1.02);
     headY=.64; tailTop=.48; tailZ=-.98; tw=.68;
+  } else if(c.b===5){ // Tonneau (gros lot)
+    const wd=mk({map:woodTex(),color:0xc08a4e,roughness:.85});
+    add(mid,cyl(.38,.38,1.5,22).rotateX(H),wd,0,.38,0); add(mid,cyl(.43,.43,.72,22).rotateX(H),wd,0,.38,0);
+    for(const z of[-.66,-.37,.37,.66])add(mid,new THREE.TorusGeometry(Math.abs(z)>.5?.385:.435,.028,8,26),paint,0,.38,z);
+    add(mid,cyl(.25,.25,.05,18),dark,0,.79,-.18);
+    add(nose,cyl(.3,.38,.1,22).rotateX(H),paint2,0,.38,.8); add(nose,cyl(.045,.045,.2,10).rotateX(H),gold,0,.38,.93); add(nose,box(.16,.04,.05),gold,0,.44,1.0);
+    add(tail,cyl(.38,.3,.1,22).rotateX(H),paint2,0,.38,-.8);
+    headY=.9; tailTop=.8; tailZ=-.62;
+  } else { // Canard (gros lot)
+    const bec=mk({color:0xff8c1a,roughness:.5});
+    add(mid,sph(.5,20,14),paint,0,.38,-.08,0,0,0,.86,.74,1.32); for(const sd of[-1,1])add(mid,sph(.27,14,10),paint2,sd*.4,.42,-.12,0,0,0,.34,.62,1.05);
+    add(nose,sph(.29,18,14),paint,0,.74,.6); add(nose,new THREE.ConeGeometry(.13,.3,14).rotateX(H),bec,0,.7,.93,0,0,0,1.25,.6,1); for(const sd of[-1,1]){add(nose,sph(.05,10,8),white,sd*.14,.83,.82); add(nose,sph(.028,8,6),dark,sd*.15,.84,.865);}
+    add(tail,new THREE.ConeGeometry(.2,.46,14).rotateX(-1.1),paint2,0,.6,-.74);
+    headY=.84; tailTop=.62; tailZ=-.9;
   }
   // chassis et essieux
   add(body,box(.46,.06,1.75),mk({map:woodTex(),color:0xb98a55,roughness:.9}),0,WR,.02);
@@ -611,9 +660,35 @@ function renderAcct(msg){ const box=$('acct'); { const b=$('bacct'); b.classList
   } }
 function setAccount(a,s,fresh){ account=a; if(s!==undefined){ session=s; try{ if(s)localStorage.setItem(SKEY,s); else localStorage.removeItem(SKEY); }catch(_){} }
   if(a){ $('nom').value=a.pseudo; $('nom').disabled=true; if(a.cfg&&!fresh){cfg=normCfg(a.cfg); buildOpts(); previewDirty=true;} else api({action:'cfg',session:session,cfg:cfg}); } else $('nom').disabled=false;
-  renderAcct(); showLevel(); syncPlay(); }
+  fixCfg(); buildOpts(); previewDirty=true; renderAcct(); showLevel(); syncPlay(); }
 async function refreshAccount(){ if(!account||!session)return; const r=await api({action:'me',session:session}); if(r.ok){ account=r.account; renderAcct(); showLevel(); } }
 
+// --- caisses
+const nextBig=()=>(openedN()+2)%10===0;
+function cratesLeft(){ const a=acctSafe(); return Math.max(0,levelOf(a?a.xp:getXP())-1-openedN()); }
+function renderCrate(){ const b=$('bcrate'); if(!b)return; const a=acctSafe(), n=cratesLeft(), have=inv().length, tot=LOOT_ALL.length, big=n>0&&nextBig(); b.className='btn'+(n?' on':'')+(big?' gros':''); b.disabled=!n;
+  b.textContent=n?(big?'🏆 Gros lot à ouvrir':'📦 '+n+(n>1?' caisses':' caisse')+' à ouvrir'):(have>=tot?'Collection complète · '+have+'/'+tot:'📦 Prochaine caisse au niveau '+(levelOf(a?a.xp:getXP())+1)+' · collection '+have+'/'+tot); }
+function drawLocal(){ const L=lootLocal(), has=id=>L.inv.includes(id), left=r=>LOOT[r].filter(id=>!has(id)), big=(L.opened+2)%10===0; if(L.opened>=levelOf(getXP())-1)return {ok:false,err:'aucune'};
+  let r=null; if(big&&left('gros').length)r='gros'; else { const rs=(big?['epique','rare','commun']:['commun','rare','epique']).filter(x=>left(x).length); if(!rs.length)return {ok:false,err:'complet'}; r=rs[0];
+    if(!big){ const W={commun:55,rare:35,epique:10}; let t=rs.reduce((q,x)=>q+W[x],0)*Math.random(); for(const x of rs){t-=W[x]; if(t<=0){r=x;break;}} } }
+  const l=left(r), id=l[rnd0(l.length)]; L.inv.push(id); L.opened++; try{localStorage.setItem('gdloot'+(PN||''),JSON.stringify(L));}catch(_){} return {ok:true,item:id,rar:r,big:big}; }
+function tuile(id){ const it=itemInfo(id), d=document.createElement('div'); d.className='tuile'; d.style.setProperty('--rc',RAR_C[rarOf(id)]); d.innerHTML=(it.col?'<s style="background:'+it.col+'"></s>':'<u>'+it.ico+'</u>')+'<span></span>'; d.lastChild.textContent=it.name; return d; }
+let crateBusy=false, crateWon=null;
+async function openCrate(){ if(crateBusy)return; crateBusy=true; audioInit(); const big=nextBig(); $('cratem').classList.remove('hidden'); $('ctitle').textContent=big?'Caisse en or · gros lot':'Caisse de niveau '+(openedN()+2);
+  $('cres').classList.add('hidden'); ['cequip','cnext'].forEach(i=>$(i).classList.add('hidden')); $('cmsg').textContent='Ouverture...'; const st=$('strip'); st.style.transition='none'; st.style.transform='none'; st.innerHTML='';
+  const a=acctSafe(), r=a?await api({action:'crate',session:session}):drawLocal();
+  if(r&&r.account&&a){ account=r.account; }
+  if(!r||!r.ok){ $('cmsg').textContent=r&&r.err==='complet'?'Collection complète : plus rien à gagner.':r&&r.err==='aucune'?'Aucune caisse à ouvrir pour l\'instant.':'Ouverture impossible, réessaie.'; crateBusy=false; renderCrate(); return; }
+  crateWon=r.item; const N=40, WIN=33, pool=big?LOOT.gros.concat(LOOT.epique,LOOT.epique,LOOT.rare):LOOT.commun.concat(LOOT.commun,LOOT.rare,LOOT.rare,LOOT.epique,LOOT.gros);
+  for(let i=0;i<N;i++)st.appendChild(tuile(i===WIN?r.item:pool[rnd0(pool.length)]));
+  void st.offsetWidth; const x=WIN*98+46-$('reel').clientWidth/2+(Math.random()-.5)*56; st.style.transition='transform 4.6s cubic-bezier(.08,.72,.1,1)'; st.style.transform='translateX('+(-x)+'px)'; $('cmsg').textContent='';
+  for(let k=0;k<16;k++)setTimeout(()=>beep(520+k*14,.05,.05),k*k*16+60);
+  setTimeout(()=>{ const it=itemInfo(r.item), rc=RAR_C[r.rar||rarOf(r.item)]; const R=$('cres'); R.style.setProperty('--rc',rc); R.classList.remove('hidden');
+    const c2=Object.assign({},cfg); if(it.col)c2.c=it.col; else c2[it.key]=it.idx; const th=thumbOf(c2); $('cimg').innerHTML=th?'<img src="'+th+'" alt="">':'<span style="font-size:60px">'+it.ico+'</span>';
+    $('cname').textContent=it.name; $('crar').textContent=it.type+' · '+RAR_N[r.rar||rarOf(r.item)]; $('cfx').textContent=it.fx; $('cequip').classList.remove('hidden'); $('cnext').classList.toggle('hidden',cratesLeft()<1);
+    beep(660,.12,.14); setTimeout(()=>beep(990,.35,.14),130); crateBusy=false; buildOpts(); renderAcct(); showLevel(); }, 4750); }
+$('bcrate').onclick=openCrate; $('cnext').onclick=openCrate; $('cclose').onclick=()=>{ if(!crateBusy)$('cratem').classList.add('hidden'); };
+$('cequip').onclick=()=>{ if(!crateWon)return; const it=itemInfo(crateWon); if(it.col)cfg.c=it.col; else cfg[it.key]=it.idx; buildOpts(); saveCfg(); $('cequip').classList.add('hidden'); $('cmsg').textContent='Équipé.'; };
 // --- salles publiques affichees a l'accueil
 let wantPub=false, lobbyPub=false; const CIRC={campagne:'Campagne',desert:'Désert',hiver:'Hiver',bournezeau:'Bournezeau'};
 async function loadSalles(){ if(LAN||EMBED)return; const box=$('salles'); if(myId||$('garage').classList.contains('hidden'))return;
@@ -1102,7 +1177,7 @@ addEventListener('resize',onResize); addEventListener('orientationchange',()=>se
 const TITRES=['Débutant','Apprenti','Casse-cou','Pilote','As du volant','Légende'];
 const getXP=()=>{try{return +localStorage.getItem('xp')||0;}catch(_){return 0;}};
 const levelOf=xp=>Math.floor(Math.sqrt(xp/800))+1;
-function showLevel(){const xp=account?account.xp:getXP(), L=levelOf(xp), a=800*(L-1)*(L-1), b=800*L*L; $('niv').innerHTML='<b>Niveau '+L+'</b> · '+TITRES[Math.min(L-1,5)]+' · '+xp.toLocaleString('fr-FR')+' XP<div class="g"><i style="width:'+((xp-a)/(b-a)*100)+'%"></i></div>';}
+function showLevel(){ renderCrate();const xp=account?account.xp:getXP(), L=levelOf(xp), a=800*(L-1)*(L-1), b=800*L*L; $('niv').innerHTML='<b>Niveau '+L+'</b> · '+TITRES[Math.min(L-1,5)]+' · '+xp.toLocaleString('fr-FR')+' XP<div class="g"><i style="width:'+((xp-a)/(b-a)*100)+'%"></i></div>';}
 function showResults(res){
   const MED=['🥇','🥈','🥉','4e','5e','6e','7e','8e']; const l=$('rlist'); l.innerHTML='';
   const best=Math.max(0,...res.map(r=>r.score||0)), crash=Math.max(0,...res.map(r=>r.hits||0)), clean=Math.min(...res.map(r=>r.time==null?99:(r.hits||0)));
@@ -1112,9 +1187,9 @@ function showResults(res){
     d.innerHTML='<span class="rg">'+(r.time==null?'':MED[i])+'</span><img alt=""><span class="nm"></span>'+aw+'<span class="tp">'+(r.time==null?'pas arrivé':fmt(r.time))+'</span><span class="pts">'+(r.score||0).toLocaleString('fr-FR')+' pts</span>';
     if(p)d.querySelector('img').src=thumbOf(p.cfg); else if(bq)d.querySelector('img').src=thumbOf(bq.cfg); d.querySelector('.nm').textContent=(p&&flagOf(p.pays)?flagOf(p.pays)+' ':'')+r.name; l.appendChild(d);});
   if(me&&!me.xpDone&&res.some(r=>r.bot)){ me.xpDone=true; $('xpl').textContent='Course avec bots : non comptée dans l\'historique'; }
-  else if(me&&!me.xpDone&&account){ me.xpDone=true; const before=levelOf(account.xp), L=levelOf(account.xp+me.score); $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP sur ton compte · Niveau '+L+(L>before?' · Niveau supérieur !':''); setTimeout(refreshAccount,2500); }
+  else if(me&&!me.xpDone&&account){ me.xpDone=true; const before=levelOf(account.xp), L=levelOf(account.xp+me.score); $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP sur ton compte · Niveau '+L+(L>before?' · Niveau supérieur ! Une caisse t\'attend à l\'atelier':''); setTimeout(refreshAccount,2500); }
   else if(me&&!me.xpDone){me.xpDone=true; const before=levelOf(getXP()), xp=getXP()+me.score; try{localStorage.setItem('xp',String(xp));}catch(_){} const L=levelOf(xp);
-    $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP · Niveau '+L+(L>before?' · Niveau supérieur !':''); showLevel();}
+    $('xpl').textContent='+'+me.score.toLocaleString('fr-FR')+' XP · Niveau '+L+(L>before?' · Niveau supérieur ! Une caisse t\'attend à l\'atelier':''); showLevel();}
   $('results').classList.remove('hidden');
 }
 

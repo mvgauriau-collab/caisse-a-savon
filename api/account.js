@@ -1,4 +1,4 @@
-// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg' | 'pays' | 'top' | 'rooms', ... }
+// Comptes pilotes : POST /api/account  { action: 'signup' | 'login' | 'me' | 'logout' | 'cfg' | 'pays' | 'top' | 'rooms' | 'crate', ... }
 import { createAccounts } from '../lib/accounts.js';
 import { makeStore } from '../lib/store.js';
 import { listRooms } from '../lib/game.js';
@@ -12,6 +12,7 @@ export async function handleAccount(body) {
     case 'pays': return accounts.setPays(b.session, b.pays);
     case 'top': return accounts.top(b.by, b.session);
     case 'rooms': return listRooms(store);
+    case 'crate': return accounts.crate(b.session);
     case 'login': return accounts.login(b.pseudo, b.code);
     case 'me': return accounts.me(b.session);
     case 'logout': return accounts.logout(b.session);

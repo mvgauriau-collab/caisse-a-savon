@@ -88,6 +88,15 @@ const t1 = await acc.top('xp', s1.session); assert.deepEqual(t1.top.slice(0, 2).
 const t2 = await acc.top('podiums'); assert.ok(t2.top.length >= 3); assert.equal(t2.me, null); assert.equal((await acc.top('nimporte')).by, 'xp');
 assert.ok(!JSON.stringify(t1).includes('hash') && !JSON.stringify(t1).includes('salt'), 'aucune donnee secrete dans le classement');
 step('classement general par experience, victoires ou podiums');
+// caisses par niveau
+{ const z = await acc.signup('Caisse', '9999', 'FR'); assert.equal((await acc.crate(z.session)).err, 'aucune', 'niveau 1 : pas de caisse');
+  await acc.credit({ key: 'caisse', rank: 0, n: 2, score: 3300, time: 50, theme: 'hiver' });   // niveau 3 : deux caisses
+  const c1 = await acc.crate(z.session), c2 = await acc.crate(z.session), c3 = await acc.crate(z.session);
+  assert.ok(c1.ok && c2.ok && c1.item !== c2.item && !c1.big); assert.equal(c3.err, 'aucune'); assert.deepEqual((await acc.me(z.session)).account.inv, [c1.item, c2.item]); assert.equal(c2.account.opened, 2);
+  for (let i = 0; i < 4; i++) await acc.credit({ key: 'caisse', rank: 0, n: 2, score: 18000, time: 50, theme: 'hiver' });   // niveau 10 : la 9e caisse est le gros lot
+  let big = null; for (let i = 0; i < 7; i++) { const c = await acc.crate(z.session); assert.ok(c.ok); if (c.big) big = c; }
+  assert.ok(big && big.rar === 'gros' && /^b[56]$/.test(big.item), 'gros lot au niveau 10'); assert.equal((await acc.crate(z.session)).err, 'aucune'); }
+step('caisses par niveau et gros lot au palier de 10');
 
 // abandon et depart de la partie
 h.say({ t: 'lobby' }); await sleep(100); h.say({ t: 'bots', v: 0 }); await sleep(80); h.say({ t: 'start' }); await sleep(150);
