@@ -876,6 +876,7 @@ function onMsg(m){
   else if(m.t==='pos'){const o=others[m.id]; if(o){o.nx=m.x;o.ns=m.z;o.v=m.s;o.na=m.a;o.nd=m.d;o.nst=m.st;o.rep=m.r; if(!o.got){o.got=true;o.x=m.x;o.s=m.z;}}}
   else if(m.t==='hit'){const ob=track&&track.objs[m.i]; if(ob&&!ob.hit&&ob.type!=='bosse'&&ob.type!=='tremplin')explode(ob,10,0);}
   else if(m.t==='wheel'){if(world&&racing)spawnWheel(m.w,m.id,m.z,m.x,m.s,m.i||0);}
+  else if(m.t==='box'){ const o=world&&racing&&world.boxes[m.i]; if(o)takeBox(o,false); }
   else if(m.t==='whit'){if(world){const w=world.wheels.find(w=>w.wid===m.w); if(w)killWheel(w,true); if(m.o===myId)addScore(200,'Touché');}}
   else if(m.t==='finished'){const o=others[m.id]; if(o)o.fin=m.time; if(m.id===myId&&me)me.finAck=true; if(m.id!==myId)toast((nameOf(m.id)||'Un pilote')+' a fini');}
   else if(m.t==='left'){const o=others[m.id]; if(o){if(o.car&&world)world.scene.remove(o.car.root); delete others[m.id];}}
@@ -1010,7 +1011,7 @@ function buildTrack(seed,theme){
     else if(kind!=='glisse'&&kind!=='tremplin'&&rnd()<.4)patch(b+room-2,(rnd()-.5)*5,1.9,1.6,rnd()<.5?'savon':'boue');
     if(Math.abs(sec.k)>=(BZ?.009:.025)){const out=sec.k>0?1:-1; deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS-6,x:out*5.7}); deco.push({type:sec.k>0?'flecheG':'flecheD',s:sec.start*DS+6,x:out*5.7});}
   });
-  return {theme:theme,gates:gates,movers:objs.filter(o=>o.type==='tonneau'),pts:pts,N:N,len:(N-1)*DS,objs:objs,buckets:buckets,patches:patches,deco:deco,finishS:finish*DS,wallS:finish*DS+40,startS:11,seed:seed0,lieu:BZ?'bournezeau':null,nom:BZ?'Bournezeau':TT.nom};
+  return {theme:theme,gates:gates,movers:objs.filter(o=>o.type==='tonneau'),pts:pts,N:N,len:(N-1)*DS,objs:objs,buckets:buckets,patches:patches,deco:deco,boxes:(()=>{ const B=[]; for(let s0=150+Math.floor(rnd()*30);s0<finish*DS-90;s0+=185+Math.floor(rnd()*40))for(const x of[-2.5,0,2.5])B.push({s:s0,x:x}); return B; })(),finishS:finish*DS,wallS:finish*DS+40,startS:11,seed:seed0,lieu:BZ?'bournezeau':null,nom:BZ?'Bournezeau':TT.nom};
 }
 function fr(s,o){ const pts=track.pts, u=clamp(s/DS,0,pts.length-1.001), i=Math.floor(u), f=u-i, a=pts[i], b=pts[i+1];
   o.x=lerp(a.x,b.x,f); o.y=lerp(a.y,b.y,f); o.z=lerp(a.z,b.z,f); o.th=lerp(a.th,b.th,f); o.slope=lerp(a.slope,b.slope,f); o.k=lerp(a.k,b.k,f);
@@ -1238,6 +1239,8 @@ function buildWorld(){
   const rampM=new THREE.MeshLambertMaterial({map:canvasTex(256,256,(c,w,h)=>{c.fillStyle='#c98f4a'; c.fillRect(0,0,w,h); for(let x=0;x<w;x+=43){c.fillStyle='rgba(80,45,10,.5)'; c.fillRect(x,0,3,h); for(let i=0;i<50;i++){c.strokeStyle='rgba(110,65,20,.3)'; const xx=x+4+Math.random()*36; c.beginPath(); c.moveTo(xx,Math.random()*h); c.lineTo(xx+(Math.random()-.5)*3,Math.random()*h); c.stroke();}}
     c.strokeStyle='#ffd23f'; c.lineWidth=22; c.lineJoin='miter'; for(let k=0;k<3;k++){const y=h-40-k*70; c.beginPath(); c.moveTo(w*.22,y); c.lineTo(w*.5,y-52); c.lineTo(w*.78,y); c.stroke();} c.fillStyle='#e8402f'; c.fillRect(0,0,w,14);}),side:THREE.DoubleSide});
   const boxGeo=new THREE.BoxGeometry(.85,.85,.85), boxM=new THREE.MeshBasicMaterial({map:canvasTex(128,128,(c,w,h)=>{const g=c.createLinearGradient(0,0,w,h); g.addColorStop(0,'#ffd23f'); g.addColorStop(.5,'#ff8c1a'); g.addColorStop(1,'#ff5a4d'); c.fillStyle=g; c.fillRect(0,0,w,h); c.strokeStyle='#fff'; c.lineWidth=10; c.strokeRect(5,5,w-10,h-10); c.fillStyle='#fff'; c.font='900 92px system-ui,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText('?',w/2,h/2+6);})}), boxes=[];
+  // caisses bonus posees en rangees sur la piste : rouler dessus donne une roue a lancer
+  (tr.boxes||[]).forEach((q,i)=>{ fr(q.s,F0); const m=new THREE.Mesh(boxGeo,boxM); m.position.set(F0.x+F0.rx*q.x,F0.y+.95,F0.z+F0.rz*q.x); m.rotation.set(.55,i,.55); scene.add(m); boxes.push({s:q.s,x:q.x,idx:i,mesh:m,hit:0,y:F0.y+.95}); });
   const stripeM=new THREE.MeshLambertMaterial({map:canvasTex(128,16,(c,w,h)=>{for(let i=0;i<8;i++){c.fillStyle=i%2?'#fff':'#e8402f'; c.beginPath(); c.moveTo(i*16,h); c.lineTo(i*16+8,0); c.lineTo(i*16+24,0); c.lineTo(i*16+16,h); c.fill();} })});
   const barrelM=new THREE.MeshLambertMaterial({map:canvasTex(64,64,(c,w,h)=>{c.fillStyle='#2f6fd0'; c.fillRect(0,0,w,h); for(let i=0;i<300;i++){c.fillStyle=Math.random()<.5?'rgba(255,255,255,.06)':'rgba(0,0,0,.1)'; c.fillRect(Math.random()*w,Math.random()*h,3,2);} c.fillStyle='#c9ced6'; c.fillRect(0,10,w,5); c.fillRect(0,h-15,w,5); c.fillStyle='#ffd23f'; c.fillRect(0,28,w,8);})});
   const poleM=new THREE.MeshLambertMaterial({map:canvasTex(16,64,(c,w,h)=>{for(let i=0;i<6;i++){c.fillStyle=i%2?'#fff':'#e8402f'; c.fillRect(0,i*h/6,w,h/6+1);}})});
@@ -1360,7 +1363,7 @@ function shed(car,list,s,v){ list.forEach(part=>{ const cl=part.clone(); cl.visi
 function addScore(n,label){ if(!me)return; me.score+=n; const d=document.createElement('div'); d.className='pop'; d.innerHTML='<b>+'+n+'</b> '+label; const P=$('pops'); P.appendChild(d); setTimeout(()=>d.remove(),1200); while(P.children.length>3)P.firstChild.remove(); }
 function takeBox(o,mine){ if(o.hit)return; o.hit=3; o.mesh.visible=false; const w=world; fr(o.s,F2); puff(F2.x+F2.rx*o.x,F2.y+1,F2.z+F2.rz*o.x,14,[0xffd23f,0xff8c1a,0xffffff],{v:6,up:5,size:.1});
   setTimeout(()=>{ if(world===w){o.hit=0; o.mesh.visible=true;} },6000);
-  if(mine){ send({t:'box',i:o.idx}); beep(880,.12,.12); setTimeout(()=>beep(1320,.2,.12),90); if(!me.item){me.item=true; toast('Bonus : roue folle'); addScore(20,'Bonus');} } }
+  if(mine){ send({t:'box',i:o.idx}); beep(880,.12,.12); setTimeout(()=>beep(1320,.2,.12),90); if(!me.item){me.item=true; toast('Roue récupérée'); addScore(20,'Bonus');} } }
 function spawnWheel(wid,owner,s,x,v,h){ const g=new THREE.Group(), sp=new THREE.Group(); g.add(sp); const t=new THREE.Mesh(WGEO,TYRE); t.castShadow=true; sp.add(t); sp.add(new THREE.Mesh(HGEO,new THREE.MeshLambertMaterial({color:0xff5a4d}))); sp.add(new THREE.Mesh(SGEO,RIM)); g.scale.setScalar(1.55); world.scene.add(g);
   fr(s,F2); world.wheels.push({wid:wid,owner:owner,s:s,x:x,v:v,h:h,px:F2.x+F2.rx*x,pz:F2.z+F2.rz*x,bi:Math.floor(s/DS),off:false,life:6,mesh:g,spin:sp,dead:false}); }
 function killWheel(w,bounce){ if(w.dead)return; w.dead=true; addDebris(w.mesh,w.s,w.v*.4,(Math.random()-.5)*7,bounce?6.5:3); }
@@ -1431,7 +1434,8 @@ function update(dt,now){
       else if(p.type==='savon'){ if(me.slip<=0){me.drift=(Math.random()<.5?-1:1)*1.8; thud(2500,.4,.25);} splash('savon',now); me.slip=1.5*ST.slip; if(Math.random()<dt*40)puff(myCar.root.position.x,myCar.root.position.y+.3,myCar.root.position.z,1,0xffffff,{v:2,up:3,g:-1,size:.2,life:1.2}); }
       else { a-=me.v*2.3*ST.mud; me.clean=0; splash(p.type,now); if(now-me.mud>300){me.mud=now; thud(700,.3,.35); shake=Math.max(shake,.12);} puff(myCar.root.position.x,myCar.root.position.y+.2,myCar.root.position.z,2,p.type==='boue'?0x5d3f24:0x8fd0ff,{v:6,up:5,size:.16}); } } }
     me.v+=a*dt; me.v=me.crashed?0:me.repair>0?Math.max(me.v,0):Math.max(me.v,me.fin!=null?9:3.2); me.turbo-=dt; me.v=Math.min(me.v,MAXV*ST.vit*(1.02+.22*boost+(me.turbo>0?.25:0)));
-    if(me.repair<=0&&me.fin==null)me.clean+=dt*ST.elan; if(me.clean<6)me.maxed=false; else if(me.clean>=7&&!me.maxed&&me.fin==null){me.maxed=true; addScore(100,'Élan max');}
+    if(me.repair<=0&&me.fin==null)me.clean+=dt*ST.elan;
+    for(const o of world.boxes){ o.mesh.rotation.y+=dt*2.4; o.mesh.position.y=o.y+Math.sin(now*.004+o.idx)*.12; if(!o.hit&&!me.item&&me.fin==null&&me.repair<=0&&Math.abs(o.s-me.s)<1.4&&Math.abs(o.x-me.x)<1.1&&me.air<.7)takeBox(o,true); } if(me.clean<6)me.maxed=false; else if(me.clean>=7&&!me.maxed&&me.fin==null){me.maxed=true; addScore(100,'Élan max');}
     const prevS=me.s; me.s=Math.min(me.s+me.v*dt,tr.wallS-1.3);
     if(!me.crashed&&me.s>=tr.wallS-1.35){me.crashed=true; crashWall(myCar,me.s,me.x,Math.max(me.v,10)); me.v=0; shake=1; thud(220,.9,1); thud(900,.5,.6);}
     if(me.air>0||me.vy>0){ me.air+=me.vy*dt; me.vy-=14*dt; if(me.air<=0){ const hard=-me.vy; me.air=0; me.vy=0; shake=Math.max(shake,.3); thud(300,.3,.6); me.nod=.25; puff(myCar.root.position.x,myCar.root.position.y,myCar.root.position.z,8,0xb9b2a3,{v:5,up:2,size:.14}); if(hard>7)hurt(5); } }
