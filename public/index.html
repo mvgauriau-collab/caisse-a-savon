@@ -1122,6 +1122,23 @@ function buildWorld(){
     const lt=canvasTex(128,16,(c,w,h)=>{for(let i=0;i<16;i++)for(let j=0;j<2;j++){c.fillStyle=(i+j)%2?'#111':'#fff'; c.fillRect(i*8,j*8,8,8);}});
     const ln=new THREE.Mesh(new THREE.PlaneGeometry(8,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:lt,polygonOffset:true,polygonOffsetFactor:-4})); ln.position.set(F0.x,F0.y+.02,F0.z); ln.rotation.order='YXZ'; ln.rotation.y=F0.th; ln.rotation.x=Math.atan(F0.slope); scene.add(ln);};
   arch(tr.startS,'DÉPART','#27ae60'); arch(tr.finishS,'ARRIVÉE','#e8402f');
+  // panneaux de sponsors le long de la piste : marques inventees pour le jeu, pas de vraies marques
+  { const tex=[
+      canvasTex(512,112,(c,W,H)=>{ c.fillStyle='#ff8a1f'; c.fillRect(0,0,W,H); c.fillStyle='#2a1458'; c.fillRect(0,H-12,W,12);
+        c.save(); c.translate(62,H/2-4); c.fillStyle='#fff3d6'; c.beginPath(); c.arc(0,0,38,0,6.283); c.fill(); c.strokeStyle='#2a1458'; c.lineWidth=5; c.stroke(); c.lineWidth=2; for(let i=0;i<8;i++){c.beginPath(); c.moveTo(0,0); c.lineTo(Math.cos(i*.785)*36,Math.sin(i*.785)*36); c.stroke();}
+        c.fillStyle='#8b5cf6'; c.beginPath(); c.moveTo(6,-30); c.lineTo(-16,6); c.lineTo(-2,6); c.lineTo(-8,30); c.lineTo(16,-8); c.lineTo(2,-8); c.closePath(); c.fill(); c.stroke(); c.restore();
+        c.fillStyle='#2a1458'; c.textBaseline='middle'; c.font='900 52px system-ui,sans-serif'; c.fillText("VOLT'ORANGE",118,H/2-10); c.font='800 17px system-ui,sans-serif'; c.fillText('LA BOISSON DES PILOTES',122,H/2+30); }),
+      canvasTex(512,112,(c,W,H)=>{ c.fillStyle='#4c2fb0'; c.fillRect(0,0,W,H); c.fillStyle='#38bdf8'; c.fillRect(0,0,W,8); c.fillRect(0,H-8,W,8);
+        c.fillStyle='rgba(255,255,255,.9)'; for(const q of[[40,62,24],[70,44,15],[84,74,11],[452,50,20],[478,74,12]]){c.beginPath(); c.arc(q[0],q[1],q[2],0,6.283); c.fill();}
+        c.fillStyle='#fff'; c.textAlign='center'; c.textBaseline='middle'; c.font='900 44px system-ui,sans-serif'; c.fillText('SAVON DU BOCAGE',W/2+6,H/2-10); c.fillStyle='#ffd9a8'; c.font='800 17px system-ui,sans-serif'; c.fillText('ÇA GLISSE TOUT SEUL',W/2+6,H/2+28); }),
+      canvasTex(512,112,(c,W,H)=>{ c.fillStyle='#0d1230'; c.fillRect(0,0,W,H); for(let i=0;i<26;i++)for(let j=0;j<2;j++){c.fillStyle=(i+j)%2?'#f4f4f4':'#0d1230'; c.fillRect(i*20,j?H-14:0,20,14);}
+        c.textAlign='center'; c.textBaseline='middle'; c.font='900 46px system-ui,sans-serif'; c.fillStyle='#fff'; c.fillText('LA GRANDE',W/2-128,H/2); c.fillStyle='#ff8a1f'; c.fillText('DESCENTE',W/2+128,H/2); }) ];
+    const L=[[],[],[]], pot=[]; let n=0;
+    for(let s=tr.startS+40;s<tr.finishS-30;s+=24){ n++; const sd=n%2?1:-1, xl=sd*6.9; fr(s,F0); const x=F0.x+F0.rx*xl, z=F0.z+F0.rz*xl;
+      // panneau en hauteur, tourne aux trois quarts vers les pilotes qui arrivent
+      const ry=Math.atan2(-.72*Math.sin(F0.th)-.7*sd*F0.rx,-.72*Math.cos(F0.th)-.7*sd*F0.rz), y=Math.max(F0.y,terrainH(x,z)); C.set(0xffffff);
+      push(L[n%3],x,y+2.45,z,1,1,1,C,ry); C.set(0x6b7280); for(const d of[-2.1,2.1])push(pot,x+Math.cos(ry)*d,y+1.45,z-Math.sin(ry)*d,1,1,1,C,ry); }
+    L.forEach((l,i)=>{ if(l.length)inst(new THREE.PlaneGeometry(4.6,1.0),new THREE.MeshBasicMaterial({map:tex[i],side:THREE.DoubleSide}),l,false); }); inst(new THREE.BoxGeometry(.09,2.9,.09),new THREE.MeshLambertMaterial(),pot,false); }
   if(tr.lieu==='bournezeau'){
     // Reperes places d'apres la vue satellite. Cote gauche (xl negatif) = est, cote droit = ouest : on descend vers le sud.
     const L=(c,o)=>new THREE.MeshLambertMaterial(Object.assign({color:c,emissive:c,emissiveIntensity:.22},o||{}));
